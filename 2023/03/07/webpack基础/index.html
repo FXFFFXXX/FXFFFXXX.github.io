@@ -1,0 +1,1576 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		
+<title>webpack基础-方永魔迹</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="shortcut icon" type="image/x-icon" href="/image/favicon.ico">
+
+<link rel="stylesheet" href="/css/index.css">
+
+
+
+<meta name="keywords" content="webpack,webpack5,">
+<meta name="description" content="">
+
+
+<script src="/js/jquery.min.js"></script>
+
+
+<script src="/js/index.js"></script>
+
+
+<script src="/js/fancybox.umd.js"></script>
+
+
+<script src="/js/fancybox-images.js"></script>
+
+
+<script src="/js/gitalk.min.js"></script>
+
+
+<script src="/js/hljs.min.js"></script>
+ 
+<script>hljs.highlightAll();</script>
+
+	<meta name="generator" content="Hexo 6.3.0"></head>
+
+	<body>
+		
+	<div class="header">
+		<div class="header-top" id="header-top">
+			<div class="h-left">
+				<a href="/">
+					<img src="/image/logo.png" alt="Quiet">
+				</a>
+			</div>
+			<div class="h-right">
+				<ul>
+					
+						
+								<li>
+									<a href="/">
+										HOME
+									</a>
+									<span class="dot"></span>
+								</li>
+								
+									
+						
+								<li>
+									<a href="/archives">
+										ARCHIVE
+									</a>
+									<span class="dot"></span>
+								</li>
+								
+									
+						
+								<li>
+									<a href="/categories">
+										CATEGORIES
+									</a>
+									<span class="dot"></span>
+								</li>
+								
+									
+						
+								<li>
+									<a href="/tags">
+										TAGS
+									</a>
+									<span class="dot"></span>
+								</li>
+								
+									
+						
+								<li>
+									<a href="/links">
+										LINKS
+									</a>
+									<span class="dot"></span>
+								</li>
+								
+									
+						
+								<li>
+									<a href="/about">
+										ABOUT
+									</a>
+									<span class="dot"></span>
+								</li>
+								
+									
+				</ul>
+			</div>
+			<div class="h-right-close">
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+					<path fill="none" d="M0 0h24v24H0z" />
+					<path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z" fill="rgba(68,68,68,1)" />
+				</svg>
+			</div>
+		</div>
+	</div>
+	<div class="sidebar">
+    <div class="topo">
+        <h2>方永魔迹</h2>
+    </div>
+    <ul>
+        
+        <li>
+            <a href="/">HOME</a>
+        </li>
+        
+        <li>
+            <a href="/archives">ARCHIVE</a>
+        </li>
+        
+        <li>
+            <a href="/categories">CATEGORIES</a>
+        </li>
+        
+        <li>
+            <a href="/tags">TAGS</a>
+        </li>
+        
+        <li>
+            <a href="/links">LINKS</a>
+        </li>
+        
+        <li>
+            <a href="/about">ABOUT</a>
+        </li>
+        
+    </ul>
+    <div class="my_foot">
+        
+        <a target="_blank" rel="noopener" href="https://github.com/79E/hexo-theme-quiet">
+            <img src="https://cdn.jsdelivr.net/gh/duogongneng/MyBlogImg/imggithub.png" alt="Quiet主题">
+        </a>
+        
+    </div>
+</div>
+<div class='shelter'>
+</div>
+<style>
+    .shelter{
+        background-color: #333;
+        opacity:0.5;
+        cursor: pointer;
+        display: none; 
+        position: fixed;
+        left: 0;
+        top: 0; 
+        right: 0;
+        bottom: 0;
+        z-index: 1998;
+    }
+    .sidebar {
+        width: 66%;
+        height: 100%;
+        position: fixed;
+        top: 0;
+        right: -100%;
+        bottom: 0;
+        background: #fff;
+        z-index: 1999;
+        text-align: center;
+        box-shadow: -6px 0 20px rgba(98, 94, 94, .815);
+    }
+
+    .topo {
+        width: 100%;
+        height: 200px;
+        background: url(https://api.ixiaowai.cn/gqapi/gqapi.php) no-repeat;
+        background-size: 100% 100%;
+        position: relative;
+        display: flex;
+        align-items: flex-end
+    }
+
+    .topo h2 {
+        color: #fff;
+        z-index: 1;
+        position: relative;
+        margin: 0 0 10px 10px;
+        font-size: 1.2em;
+        box-sizing: border-box
+    }
+
+    .topo:before {
+        content: '';
+        background-image: url(/image/pattern.png);
+        background-repeat: repeat;
+        height: 100%;
+        left: 0;
+        position: absolute;
+        top: 0;
+        width: 100%;
+        z-index: 1
+    }
+
+    .sidebar ul {
+        width: 100%;
+        margin-top: 50px
+    }
+
+    .sidebar ul li {
+        height: 50px;
+        list-style: none;
+        font-size: 1.2em;
+        text-align: right;
+        margin-right: 10px
+    }
+
+    .sidebar ul li a {
+        display: grid;
+        color: #5d606a;
+        text-overflow: ellipsis;
+        width: 100%;
+        text-decoration: none
+    }
+
+    .my_foot {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        position: absolute;
+        bottom: 0
+    }
+
+    .my_foot a {
+        text-decoration: none;
+        margin-right: 10px;
+        display: inline-block
+    }
+
+    .my_foot a img {
+        width: 30px;
+        height: 30px
+    }
+</style>
+
+<script>
+    $( function () {
+	$( '.h-right-close>svg' )
+		.click( function () {
+			$( '.sidebar' )
+				.animate( {
+					right: "0"
+				}, 500 );
+			$( '.shelter' )
+				.fadeIn( "slow" )
+		} );
+	$( '.shelter' )
+		.click( function ( e ) {
+			$( '.sidebar' )
+				.animate( {
+					right: "-100%"
+				}, 500 );
+			$( '.shelter' )
+				.fadeOut( "slow" )
+		} )
+} )
+
+</script>
+
+<div class="post">
+    <div class="post-header-background post-header-img"
+    style="background: url('https://api.ixiaowai.cn/gqapi/gqapi.php')" 
+>
+    <div class="post-header-background-content">
+        <ul class="post-header-tag">
+            
+            
+            <li><a href="/tags/webpack,webpack5">webpack,webpack5</a></li>
+            
+            
+        </ul>
+        
+        <h1>webpack基础</h1>
+        <div class="post-header-info">
+            <div class="post-header-info-author">
+                
+                    <svg t="1604839279282" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                        xmlns="http://www.w3.org/2000/svg" p-id="2901" width="20" height="20">
+                        <path
+                            d="M513 956.3c-247.7 0-448-200.3-448-448S265.3 66.2 513 66.2s448 200.3 448 448-200.3 442.1-448 442.1z m0-830.9c-212.2 0-388.8 170.7-388.8 388.8C124.2 726.3 294.9 903 513 903c212.2 0 388.8-170.7 388.8-388.8S725.2 125.4 513 125.4z m0 430.2c-94.2 0-170.7-76.5-170.7-170.7S418.8 207.8 513 207.8s170.7 76.5 170.7 170.7S607.2 555.6 513 555.6z m0-289.1c-64.6 0-112 52.8-112 112s47.4 117.9 112 117.9 112-52.8 112-112-47.4-117.9-112-117.9z m0 689.8c-135.7 0-259-58.7-341.9-158.9l-11.8-17.8 11.8-17.8c76.5-117.9 206.2-188.5 347.8-188.5 135.7 0 265 64.6 341.9 182.6l11.8 17.8-11.8 17.8C778 897.1 648.7 956.3 513 956.3zM230.3 773.2C300.9 849.7 406.9 897 513 897c112 0 218.1-47.4 288.6-129.8-70.5-88.2-170.7-135.6-282.7-135.6s-218.1 53.3-288.6 141.6z"
+                            p-id="2902" fill="#ffffff"></path>
+                    </svg>
+                    
+                <span class="post-header-info-author-text"> <a href="../../about">方永魔迹</a></span>
+                <div class="post-header-info-author-categories">
+                    
+                </div>
+                <p>2023-03-07 15:43:34</p>
+            </div>
+        </div>
+    </div>
+</div>
+    <div class="post-content" id="content">
+  
+  <div id="article" class="post-content-info">
+    
+
+    <h1 id="webpack基础"><a href="#webpack基础" class="headerlink" title="webpack基础"></a>webpack基础</h1><h2 id="打包工具的作用"><a href="#打包工具的作用" class="headerlink" title="打包工具的作用"></a>打包工具的作用</h2><p>当开发时有以下情况时，代码无法直接在浏览器中运行：</p>
+<ul>
+<li>使用es6相关语法，使用TS</li>
+<li>使用Less &#x2F; Sass等css预处理器</li>
+<li>使用React &#x2F; Vue等框架</li>
+</ul>
+<p>打包工具（webpack）可以将以上情况的代码编译成能被浏览器识别运行的js、css等语法，除此之外打包工具（webpack）还能压缩代码、做兼容性处理、提升代码性能等。</p>
+<h2 id="下载webpack"><a href="#下载webpack" class="headerlink" title="下载webpack"></a>下载webpack</h2><p><code>npm i webpack webpack-cli -D</code></p>
+<p>随后便可使用webpack命令进行打包，默认输出目录为.&#x2F;dist</p>
+<pre><code>npx webpack 入口(entry) --mode=模式（开发 / 生产）
+
+npx webpack ./src/main.js --mode=production
+</code></pre>
+<h2 id="核心概念"><a href="#核心概念" class="headerlink" title="核心概念"></a>核心概念</h2><ul>
+<li>入口(entry)：指示 Webpack 从哪个文件开始打包</li>
+<li>输出(output)：指示 Webpack 打包完的文件输出到哪里去，如何命名等</li>
+<li>加载器(loader)：webpack 本身只能处理 js、json 等资源，loader用于解析其他资源，loader可以直接使用无需引入</li>
+<li>插件(plugins)：扩展 webpack 的功能，插件需引入，一般为构造函数，需在plugins中实例化</li>
+<li>模式(mode)：主要有开发模式(development)和生产模式(production)，在开发模式下只会编译 JS 中的 <code>ES Module</code> 语法，在生产模式下还能压缩代码</li>
+</ul>
+<h2 id="基本配置文件"><a href="#基本配置文件" class="headerlink" title="基本配置文件"></a>基本配置文件</h2><p>在项目根目录中创建<code>webpack.config.js</code>文件作为webpack配置文件，当目录下有该文件时，<code>npx webpack</code>会读取该文件进行项目打包。webpack 是基于 node.js 运行的，所以该配置文件采用 common.js 模块化规范，主要结构如下：</p>
+<pre><code class="js">module.exports = &#123;
+    // 入口
+    entry: &quot;&quot;,  // 入口路径
+    
+    // 输出
+    output: &#123;
+        // 文件输出路径
+        path: &quot;&quot;,  // 输出必须为绝对路径
+        // 文件名
+        filename: &quot;&quot;,
+    &#125;,
+    
+    // 加载器
+    module: &#123;
+        rules: [
+            // 加载器配置
+            &#123;
+                test: /正则/,  // 正则匹配文件名，该加载器只处理匹配到的文件
+                // loader只可指定一个加载器，而use是loader数组从而可指定多个加载器
+                // 可以是loader字符串，也可是loader对象
+                use: [loader数组] // 执行顺序：从下到上 / 从右到左
+            &#125;,
+        ],
+    &#125;,
+    // 插件
+    plugins: [
+        // 插件配置
+    ],
+    // 模式
+    mode: &quot;&quot; // development / production
+&#125;
+</code></pre>
+<ul>
+<li>配置文件的文件路径和文件名也可自定义，使用命令<code>npx webpack --config 配置文件</code>即可将自定义文件作为webpack配置文件</li>
+<li>配置文件的输入输出目录是命令执行的目录，故相对路径是相对于执行目录，在使用到绝对路径(如__dirname)时需维护路径</li>
+</ul>
+<h2 id="基本使用"><a href="#基本使用" class="headerlink" title="基本使用"></a>基本使用</h2><ul>
+<li>使用前需先下载所需依赖包、loader和plugins</li>
+</ul>
+<h3 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h3><ul>
+<li>可以在output中添加clean，以自动清空上次内容(配置了开发服务器时此项无意义)</li>
+<li>可以在加载器rules数组的元素中添加generator，以配置每项rule处理文件的输出路径和文件名</li>
+<li>在开发模式下，可下载<code>webpack-dev-server</code>开发服务器，并在配置文件中通过<code>devServer</code>配置开发服务器，通过<code>npx webpack serve</code>开启开发服务器，以实现代码修改时自动打包到内存中更新，此时不会输出到外存中显示</li>
+</ul>
+<pre><code class="js">const path = require(&#39;path&#39;);
+
+module.exports = &#123;
+    // 入口
+    entry: &quot;./src/main.js&quot;,  // 相对路径
+    // 输出
+    output: &#123;
+        // 所有文件输出路径
+        path: path.resolve(__dirname, &#39;dist&#39;),  // 绝对路径
+        // 入口文件输出路径及文件名
+        filename: &quot;main.js&quot;,
+        // 自动清空上次打包的内容
+        // 先清空path目录，再进行打包
+        clean: true, // 在开发服务器中无意义
+    &#125;,
+    // 加载器
+    module: &#123;
+        rules: [
+            // 加载器配置
+            &#123;
+                test: /\.(ttf|woff2?)$/,
+                type: &quot;asset/resource&quot;,
+                generator: &#123;
+                    // 匹配到的文件输出路径及文件名
+                    // 将图片文件输出到 static/media 目录中
+                    // 将图片文件命名 [hash:10][ext][query]
+                    // [hash:10]: hash值取10位，用于文件名唯一
+                    // [ext]: 使用之前的文件扩展名
+                    // [query]: 添加之前的query参数
+                    filename: &#39;static/media/[hash:10][ext][query]&#39;,
+                &#125;
+            &#125;,
+        ],
+    &#125;,
+    // 插件
+    plugins: [
+        // 插件配置
+    ],
+    // 模式
+    mode: &quot;development&quot;,
+    // 开发服务器
+    devServer: &#123;
+        host: &quot;localhost&quot;, // 启动服务器域名
+        port: &quot;3000&quot;, // 启动服务器端口号
+        open: true, // 是否自动打开浏览器
+    &#125;,
+&#125;
+</code></pre>
+<h3 id="处理HTML资源"><a href="#处理HTML资源" class="headerlink" title="处理HTML资源"></a>处理HTML资源</h3><ul>
+<li>下载<code>html-webpack-plugin</code>插件，在webpack配置文件的plugins中注册</li>
+<li>注册时可提供模板html文件</li>
+<li>打包时在打包目录生成<code>index.html</code>，结构与提供的模板html文件一致</li>
+<li>自动引入所需js资源，与其他插件的配合下也会自动引入其他资源</li>
+<li>HTML资源在生产模式下会自动压缩</li>
+</ul>
+<pre><code class="js">const path = require(&#39;path&#39;);
+const HtmlWebpackPlugin = require(&#39;html-webpack-plugin&#39;);
+
+module.exports = &#123;
+    // 入口
+    entry: &quot;./src/main.js&quot;,  // 相对路径
+    // 输出
+    output: &#123;
+        // 所有文件输出路径
+        path: path.resolve(__dirname, &#39;dist&#39;),  // 绝对路径
+        // 入口文件输出文件名
+        filename: &quot;main.js&quot;,
+        // 自动清空上次打包的内容
+        // 先清空path目录，再进行打包
+        clean: true,
+    &#125;,
+    // 加载器
+    module: &#123;
+        rules: [
+            // 加载器配置
+        ],
+    &#125;,
+    // 插件
+    plugins: [
+        // 插件配置
+        // 以 public/index.html 为模板创建文件
+        // 新的html文件有两个特点：1. 内容和源文件一致 2. 自动引入打包生成的js等资源
+        new HtmlWebpackPlugin(&#123;
+            template: path.resolve(__dirname, &#39;public/index.html&#39;),
+        &#125;),
+    ],
+    // 模式
+    mode: &quot;development&quot;,
+&#125;
+</code></pre>
+<h3 id="处理样式资源"><a href="#处理样式资源" class="headerlink" title="处理样式资源"></a>处理样式资源</h3><h4 id="加载样式资源"><a href="#加载样式资源" class="headerlink" title="加载样式资源"></a>加载样式资源</h4><ul>
+<li>需下载<code>style-loader css-loader less-loader sass-loader stylus-loader</code></li>
+<li><code>less-loader sass-loader stylus-loader</code>负责将对应的预处理样式资源编译成css资源</li>
+<li><code>css-loader</code>负责将css资源编译成commonjs的模块到js中</li>
+<li><code>style-loader</code>负责将js中css通过创建style标签添加到html文件中生效</li>
+<li>注意loader顺序</li>
+</ul>
+<pre><code class="js">const path = require(&#39;path&#39;);
+
+module.exports = &#123;
+    // 入口
+    entry: &quot;./src/main.js&quot;,  // 相对路径
+    
+    // 输出
+    output: &#123;
+        // 所有文件输出路径
+        path: path.resolve(__dirname, &#39;dist&#39;),  // 绝对路径
+        // 入口文件输出路径及文件名
+        filename: &quot;main.js&quot;,
+        // 自动清空上次打包的内容
+        // 先清空path目录，再进行打包
+        clean: true, // 在开发服务器中无意义
+    &#125;,
+    
+    // 加载器
+    module: &#123;
+        rules: [
+            // 加载器配置
+            &#123;
+                test: /\.css$/,  // 正则匹配文件名，只检测匹配到的文件
+                use: [
+                    // 执行顺序：从下到上/从右到左（顺序不可乱）
+                    &#39;style-loader&#39;, // 将js中css通过创建style标签添加到html文件中生效
+                    &#39;css-loader&#39;,  // 将css资源编译成commonjs的模块到js中
+                ],
+            &#125;,
+            &#123;
+                test: /\.less$/,
+                use: [
+                    &#39;style-loader&#39;, // 将js中css通过创建style标签添加到html文件中生效
+                    &#39;css-loader&#39;,  // 将css资源编译成commonjs的模块到js中
+                    &#39;less-loader&#39;, // 将less资源编译成css资源
+                ],
+            &#125;,
+            &#123;
+                test: /\.s[ac]ss$/,
+                use: [
+                    &#39;style-loader&#39;, // 将js中css通过创建style标签添加到html文件中生效
+                    &#39;css-loader&#39;,  // 将css资源编译成commonjs的模块到js中
+                    &#39;sass-loader&#39;, // 将sass/scss资源编译成css资源
+                ],
+            &#125;,
+            &#123;
+                test: /\.styl$/,
+                use: [
+                    &#39;style-loader&#39;, // 将js中css通过创建style标签添加到html文件中生效
+                    &#39;css-loader&#39;,  // 将css资源编译成commonjs的模块到js中
+                    &#39;stylus-loader&#39;, // 将stylus资源编译成css资源
+                ],
+            &#125;,
+        ],
+    &#125;,
+    // 插件
+    plugins: [
+        // 插件配置
+    ],
+    // 模式
+    mode: &quot;development&quot;
+&#125;
+</code></pre>
+<h4 id="提取css文件"><a href="#提取css文件" class="headerlink" title="提取css文件"></a>提取css文件</h4><ul>
+<li>上述中是通过<code>style-loader</code>将js中css通过创建style标签添加到html文件中生效，所以是加载js时才会创建style标签添加到html中，此时页面会出现闪屏现象</li>
+<li>通过<code>mini-css-extract-plugin</code>插件，在webpack配置文件的plugins中注册，可提取css样式为单独文件到指定目录</li>
+<li>该插件中包含一个loader，用于替换<code>style-loader</code>，此时样式不会在加载js时创建style标签，而是通过<code>html-webpack-plugin</code>插件，通过link引入css文件</li>
+</ul>
+<pre><code class="js">const path = require(&#39;path&#39;);
+const HtmlWebpackPlugin = require(&#39;html-webpack-plugin&#39;);
+const MiniCssExtractPlugin = require(&#39;mini-css-extract-plugin&#39;);
+
+module.exports = &#123;
+    // 入口
+    entry: &quot;./src/main.js&quot;,  // 相对路径
+    // 输出
+    output: &#123;
+        // 所有文件输出路径
+        path: path.resolve(__dirname, &#39;dist&#39;),  // 绝对路径
+        // 入口文件输出文件名
+        filename: &quot;main.js&quot;,
+        // 自动清空上次打包的内容
+        // 先清空path目录，再进行打包
+        clean: true,
+    &#125;,
+    // 加载器
+    module: &#123;
+        rules: [
+            // 加载器配置
+            &#123;
+                test: /\.css$/,  // 正则匹配文件名，只检测匹配到的文件
+                use: [
+                    // 执行顺序：从下到上/从右到左（顺序不可乱）
+                    MiniCssExtractPlugin.loader, // 通过link引入css文件
+                    &#39;css-loader&#39;,  // 将css资源编译成commonjs的模块到js中
+                ],
+            &#125;,
+            &#123;
+                test: /\.less$/,
+                use: [
+                    MiniCssExtractPlugin.loader, // 通过link引入css文件
+                    &#39;css-loader&#39;,  // 将css资源编译成commonjs的模块到js中
+                    &#39;less-loader&#39;, // 将less资源编译成css资源
+                ],
+            &#125;,
+            &#123;
+                test: /\.s[ac]ss$/,
+                use: [
+                    MiniCssExtractPlugin.loader, // 通过link引入css文件
+                    &#39;css-loader&#39;,  // 将css资源编译成commonjs的模块到js中
+                    &#39;sass-loader&#39;, // 将sass/scss资源编译成css资源
+                ],
+            &#125;,
+            &#123;
+                test: /\.styl$/,
+                use: [
+                    MiniCssExtractPlugin.loader, // 通过link引入css文件
+                    &#39;css-loader&#39;,  // 将css资源编译成commonjs的模块到js中
+                    &#39;stylus-loader&#39;, // 将stylus资源编译成css资源
+                ],
+            &#125;,
+        ],
+    &#125;,
+    // 插件
+    plugins: [
+        // 插件配置
+
+        // 以 public/index.html 为模板创建文件
+        // 新的html文件有两个特点：1. 内容和源文件一致 2. 自动引入打包生成的js等资源
+        new HtmlWebpackPlugin(&#123;
+            template: path.resolve(__dirname, &#39;public/index.html&#39;),
+        &#125;),
+
+        // 提取css成单独文件
+        new MiniCssExtractPlugin(&#123;
+            // 定义输出文件名和目录
+            filename: &#39;static/css/main.css&#39;,
+        &#125;),
+    ],
+    // 模式
+    mode: &quot;development&quot;,
+&#125;
+</code></pre>
+<h4 id="css兼容性处理"><a href="#css兼容性处理" class="headerlink" title="css兼容性处理"></a>css兼容性处理</h4><ul>
+<li>根据预设值，webpack会将css样式转换成向后兼容的样式(如添加前缀)</li>
+<li>通过<code>postcss</code>、<code>postcss-loader</code>，配置css兼容性处理loader，一般情况下设置预设为<code>postcss-preset-env</code>，三者均需下载</li>
+<li><code>postcss-loader</code>位于<code>css-loader</code>之后，预处理器loader之前(loader执行顺序为从后到前)，意为在webpack编译css样式前进行兼容性处理，且兼容性处理的为css样式</li>
+<li>需要写css兼容性配置，可在<code>package.json</code>中的<code>browserslist</code>中进行配置，同时可对开发模式&#x2F;生产模式单独配置</li>
+</ul>
+<pre><code class="js">// webpack.config.js
+
+const path = require(&#39;path&#39;);
+const HtmlWebpackPlugin = require(&#39;html-webpack-plugin&#39;);
+const MiniCssExtractPlugin = require(&#39;mini-css-extract-plugin&#39;);
+
+const getStyleLoaders = (pre) =&gt; [
+    // 执行顺序：从下到上/从右到左（顺序不可乱）
+    MiniCssExtractPlugin.loader, // 通过link引入css文件
+    &#39;css-loader&#39;, // 将css资源编译成commonjs的模块到js中
+    &#123;
+        // css兼容性处理
+        loader: &#39;postcss-loader&#39;,
+        options: &#123;
+            postcssOptions: &#123;
+                plugins: [
+                    &#39;postcss-preset-env&#39;, // 智能预设
+                ]
+            &#125;
+        &#125;
+    &#125;,
+    pre // 预处理器loader, 将预处理资源编译成css资源
+].filter(Boolean);
+
+module.exports = &#123;
+    // 入口
+    entry: &quot;./src/main.js&quot;,  // 相对路径
+    // 输出
+    output: &#123;
+        // 所有文件输出路径
+        path: path.resolve(__dirname, &#39;dist&#39;),  // 绝对路径
+        // 入口文件输出文件名
+        filename: &quot;main.js&quot;,
+        // 自动清空上次打包的内容
+        // 先清空path目录，再进行打包
+        clean: true,
+    &#125;,
+    // 加载器
+    module: &#123;
+        rules: [
+            // 加载器配置
+            &#123;
+                test: /\.css$/,  // 正则匹配文件名，只检测匹配到的文件
+                use: getStyleLoaders(),
+            &#125;,
+            &#123;
+                test: /\.less$/,
+                use: getStyleLoaders(&#39;less-loader&#39;),
+            &#125;,
+            &#123;
+                test: /\.s[ac]ss$/,
+                use: getStyleLoaders(&#39;sass-loader&#39;),
+            &#125;,
+            &#123;
+                test: /\.styl$/,
+                use: getStyleLoaders(&#39;stylus-loader&#39;),
+            &#125;,
+        ],
+    &#125;,
+    // 插件
+    plugins: [
+        // 插件配置
+
+        // 以 public/index.html 为模板创建文件
+        // 新的html文件有两个特点：1. 内容和源文件一致 2. 自动引入打包生成的js等资源
+        new HtmlWebpackPlugin(&#123;
+            template: path.resolve(__dirname, &#39;public/index.html&#39;),
+        &#125;),
+
+        // 提取css成单独文件
+        new MiniCssExtractPlugin(&#123;
+            // 定义输出文件名和目录
+            filename: &#39;static/css/main.css&#39;,
+        &#125;),
+    ],
+    // 模式
+    mode: &quot;development&quot;,
+&#125;
+</code></pre>
+<pre><code class="json">// package.json
+&#123;
+    //css兼容性配置
+    &quot;browserslist&quot;: [
+        &quot;last 2 version&quot;,
+        &quot;&gt; 1%&quot;,
+        &quot;not dead&quot;
+    ]
+&#125;
+</code></pre>
+<h4 id="css压缩"><a href="#css压缩" class="headerlink" title="css压缩"></a>css压缩</h4><ul>
+<li>HTML和JS资源在生产模式模式下会自动压缩，css则需借助<code>css-minimizer-webpack-plugin</code>插件，在webpack配置文件的plugins中注册</li>
+<li>开发模式压缩时是将每个样式文件压缩成一行，并保留文件注释</li>
+</ul>
+<pre><code class="js">const path = require(&#39;path&#39;);
+const HtmlWebpackPlugin = require(&#39;html-webpack-plugin&#39;);
+const MiniCssExtractPlugin = require(&#39;mini-css-extract-plugin&#39;);
+const CssMinimizerPlugin = require(&#39;css-minimizer-webpack-plugin&#39;);
+
+const getStyleLoaders = (pre) =&gt; [
+    // 执行顺序：从下到上/从右到左（顺序不可乱）
+    MiniCssExtractPlugin.loader, // 通过link引入css文件
+    &#39;css-loader&#39;, // 将css资源编译成commonjs的模块到js中
+    &#123;
+        // css兼容性处理
+        loader: &#39;postcss-loader&#39;,
+        options: &#123;
+            postcssOptions: &#123;
+                plugins: [
+                    &#39;postcss-preset-env&#39;, // 智能预设
+                ]
+            &#125;
+        &#125;
+    &#125;,
+    pre // 预处理器loader, 将预处理资源编译成css资源
+].filter(Boolean);
+
+module.exports = &#123;
+    // 入口
+    entry: &quot;./src/main.js&quot;,  // 相对路径
+    // 输出
+    output: &#123;
+        // 所有文件输出路径
+        path: path.resolve(__dirname, &#39;dist&#39;),  // 绝对路径
+        // 入口文件输出文件名
+        filename: &quot;main.js&quot;,
+        // 自动清空上次打包的内容
+        // 先清空path目录，再进行打包
+        clean: true,
+    &#125;,
+    // 加载器
+    module: &#123;
+        rules: [
+            // 加载器配置
+            &#123;
+                test: /\.css$/,  // 正则匹配文件名，只检测匹配到的文件
+                use: getStyleLoaders(),
+            &#125;,
+            &#123;
+                test: /\.less$/,
+                use: getStyleLoaders(&#39;less-loader&#39;),
+            &#125;,
+            &#123;
+                test: /\.s[ac]ss$/,
+                use: getStyleLoaders(&#39;sass-loader&#39;),
+            &#125;,
+            &#123;
+                test: /\.styl$/,
+                use: getStyleLoaders(&#39;stylus-loader&#39;),
+            &#125;,
+        ],
+    &#125;,
+    // 插件
+    plugins: [
+        // 插件配置
+
+        // 以 public/index.html 为模板创建文件
+        // 新的html文件有两个特点：1. 内容和源文件一致 2. 自动引入打包生成的js等资源
+        new HtmlWebpackPlugin(&#123;
+            template: path.resolve(__dirname, &#39;public/index.html&#39;),
+        &#125;),
+
+        // 提取css成单独文件
+        new MiniCssExtractPlugin(&#123;
+            // 定义输出文件名和目录
+            filename: &#39;static/css/main.css&#39;,
+        &#125;),
+
+        // 压缩css
+        new CssMinimizerPlugin(),
+    ],
+    // 模式
+    mode: &quot;development&quot;,
+&#125;
+</code></pre>
+<h3 id="处理静态资源-字体图标、文本、图片、多媒体"><a href="#处理静态资源-字体图标、文本、图片、多媒体" class="headerlink" title="处理静态资源(字体图标、文本、图片、多媒体)"></a>处理静态资源(字体图标、文本、图片、多媒体)</h3><ul>
+<li>在webpack4时需下载<code>file-loader</code>和<code>url-loader</code>进行处理，在webpack5中已内置</li>
+<li>在webpack5中通过<code>type=&#39;asset&#39;</code>来表示加载静态资源模块，无需配置额外的loader</li>
+<li>type取值有多种，常见的如下<ul>
+<li><code>asset/resource</code>发送一个单独的文件并导出 URL。之前通过使用 <code>file-loader</code> 实现。多用于字体图标和多媒体</li>
+<li><code>asset/inline</code> 导出一个资源的 data URI。之前通过使用 <code>url-loader</code> 实现。多用于svg</li>
+<li><code>asset</code> 在导出一个 data URI 和发送一个单独的文件之间自动选择。之前通过使用 <code>url-loader</code>，并且配置资源体积限制实现。多用于图片，因为转为data URI时可减少请求数量，但会让体积变大，故图片小时导出data URI，图片大时发送一个单独文件</li>
+<li><code>asset/source</code> 导出资源的源代码。之前通过使用 <code>raw-loader</code> 实现。多用于文本，导出文件内容</li>
+</ul>
+</li>
+</ul>
+<pre><code class="js">const path = require(&#39;path&#39;);
+
+module.exports = &#123;
+    // 入口
+    entry: &quot;./src/main.js&quot;,  // 相对路径
+    // 输出
+    output: &#123;
+        // 所有文件输出路径
+        path: path.resolve(__dirname, &#39;dist&#39;),  // 绝对路径
+        // 入口文件输出文件名
+        filename: &quot;main.js&quot;,
+        // 自动清空上次打包的内容
+        // 先清空path目录，再进行打包
+        clean: true,
+    &#125;,
+    // 加载器
+    module: &#123;
+        rules: [
+            // 加载器配置
+            &#123;
+                test: /\.(ttf|woff2?|mp3|mp4|avi|mkv)$/,
+                type: &quot;asset/resource&quot;,
+                generator: &#123;
+                    // 匹配到的文件输出路径
+                    // 将文件输出到 static/media 目录中
+                    // 将图片文件命名 [hash:10][ext][query]
+                    // [hash:10]: hash值取10位
+                    // [ext]: 使用之前的文件扩展名
+                    // [query]: 添加之前的query参数
+                    filename: &#39;static/media/[hash:10][ext][query]&#39;,
+                &#125;
+            &#125;,
+            &#123;
+                test: /\.svg$/,
+                type: &quot;asset/inline&quot;,
+            &#125;,
+            &#123;
+                test: /\.(png|jpe?g|gif|bmp)$/,
+                type: &quot;asset&quot;,
+                parser: &#123;
+                    dataUrlCondition: &#123;
+                        maxSize: 10 * 1024 // 小于10kb的图片会被base64处理,即data URI
+                    &#125;
+                &#125;,
+                generator: &#123;
+                    // 匹配到的文件输出路径
+                    // 将文件输出到 static/images 目录中
+                    // 将图片文件命名 [hash:10][ext][query]
+                    // [hash:10]: hash值取10位
+                    // [ext]: 使用之前的文件扩展名
+                    // [query]: 添加之前的query参数
+                    filename: &#39;static/images/[hash:10][ext][query]&#39;,
+                &#125;,
+            &#125;,
+            &#123;
+                test: /\.txt$/,
+                type: &quot;asset/resource&quot;,
+            &#125;,
+        ],
+    &#125;,
+    // 插件
+    plugins: [
+        // 插件配置
+    ],
+    // 模式
+    mode: &quot;development&quot;,
+&#125;
+</code></pre>
+<h3 id="处理JS资源"><a href="#处理JS资源" class="headerlink" title="处理JS资源"></a>处理JS资源</h3><ul>
+<li>webpack默认只能处理<code>ES Module</code>语法，JS资源在生产模式下会自动压缩</li>
+<li>针对代码格式，我们使用 Eslint 来完成</li>
+<li>针对 js 兼容性处理，我们使用 Babel 来完成</li>
+</ul>
+<h4 id="JS代码格式检查-ESLint"><a href="#JS代码格式检查-ESLint" class="headerlink" title="JS代码格式检查(ESLint)"></a>JS代码格式检查(ESLint)</h4><ul>
+<li><p>下载<code>eslint</code>和<code>eslint-webpack-plugin</code></p>
+</li>
+<li><p>通过<code>ESLint</code>检查工具和<code>eslint-webpack-plugin</code>插件对JS代码进行格式检查，用于统一代码格式，便于团队开发</p>
+</li>
+<li><p>配置文件位于项目根目录，命名有多种，如<code>.eslintrc</code>、<code>.eslintrc.js</code>和<code>.eslintrc.json</code>，或在<code>package.json</code>中配置<code>eslintConfig</code>，ESLint 会查找和自动读取它们</p>
+</li>
+<li><p>常用的配置选项有<code>extends</code> 继承、<code>parserOptions</code>解析选项和<code>rules</code>规则</p>
+</li>
+<li><p>rules的每项规则有三种取值，rules中配置的规则会覆盖extends中继承的规则，rules规则目录详见<a target="_blank" rel="noopener" href="https://eslint.bootcss.com/docs/rules/">ESLint文档</a></p>
+<ul>
+<li><code>&quot;off&quot;</code> 或 <code>0</code> : 关闭规则</li>
+<li><code>&quot;warn&quot;</code> 或 <code>1</code> : 开启规则，使用警告级别的错误：<code>warn</code> (不会导致程序退出)</li>
+<li><code>&quot;error&quot;</code> 或 <code>2</code>: 开启规则，使用错误级别的错误：<code>error</code> (当被触发的时候，程序会退出)</li>
+</ul>
+</li>
+</ul>
+<pre><code class="js">// webpack.config.js
+
+const path = require(&#39;path&#39;);
+const ESLintWebpackPlugin = require(&#39;eslint-webpack-plugin&#39;);
+
+module.exports = &#123;
+    // 入口
+    entry: &quot;./src/main.js&quot;,  // 相对路径
+    // 输出
+    output: &#123;
+        // 所有文件输出路径
+        path: path.resolve(__dirname, &#39;dist&#39;),  // 绝对路径
+        // 入口文件输出文件名
+        filename: &quot;main.js&quot;,
+        // 自动清空上次打包的内容
+        // 先清空path目录，再进行打包
+        clean: true,
+    &#125;,
+    // 加载器
+    module: &#123;
+        rules: [
+            // 加载器配置
+        ],
+    &#125;,
+    // 插件
+    plugins: [
+        // 插件配置
+
+        // 使用ESLint进行js代码格式检查
+        new ESLintWebpackPlugin(&#123;
+            // 指定检查文件的根目录
+            context: path.resolve(__dirname, &quot;src&quot;),
+        &#125;),
+    ],
+    // 模式
+    mode: &quot;development&quot;,
+&#125;
+</code></pre>
+<pre><code class="js">// .eslintrc.js
+
+module.exports = &#123;
+    // 继承 Eslint 官方规则
+    extends: [&quot;eslint:recommended&quot;],
+    // 设置环境
+    env: &#123;
+        node: true, // 启用node中全局变量
+        browser: true, // 启用浏览器中全局变量
+    &#125;,
+    // 设置解析选项
+    parserOptions: &#123;
+        ecmaVersion: 6, // 设置ES语法版本
+        sourceType: &quot;module&quot;, // 设置模块化语法
+    &#125;,
+    rules: &#123;
+        &quot;no-var&quot;: 2, // 不能使用 var 定义变量 2--‘error’
+    &#125;,
+&#125;;
+</code></pre>
+<h4 id="JS兼容性处理-Babel"><a href="#JS兼容性处理-Babel" class="headerlink" title="JS兼容性处理(Babel)"></a>JS兼容性处理(Babel)</h4><ul>
+<li><p>下载<code> @babel/core</code>、和<code>babel-loader</code>，以及对应的预设</p>
+</li>
+<li><p>通过Babel(JS编译器)和<code>babel-loader</code>，将编写的JS代码(主要是ES6语法)转换为向后兼容的 JavaScript 语法，以便能够运行在当前和旧版本的浏览器或其他环境中</p>
+</li>
+<li><p>配置文件位于项目根目录，命名有多种，如<code>babel.config.js</code>、<code>babel.config.json</code>、<code>.babelrc</code>、<code>.babelrc.js</code>和<code>.babelrc.json</code>，或在<code>package.json</code>中配置<code>babel</code>，Babel会查找和自动读取它们</p>
+</li>
+<li><p>主要配置选项是<code>presets </code>预设，简单理解为一组 Babel 插件, 扩展 Babel 功能</p>
+<ul>
+<li><code>@babel/preset-env</code>: 一个智能预设，允许您使用最新的 JavaScript。</li>
+<li><code>@babel/preset-react</code>：一个用来编译 React jsx 语法的预设</li>
+<li><code>@babel/preset-typescript</code>：一个用来编译 TypeScript 语法的预设</li>
+</ul>
+</li>
+<li><p>在新版本中箭头函数默认不再转换为普通函数，可以在<code>output</code>中禁用箭头函数</p>
+</li>
+</ul>
+<pre><code class="js">// webpack.config.js
+
+const path = require(&#39;path&#39;);
+
+module.exports = &#123;
+    // 入口
+    entry: &quot;./src/main.js&quot;,  // 相对路径
+    // 输出
+    output: &#123;
+        // 所有文件输出路径
+        path: path.resolve(__dirname, &#39;dist&#39;),  // 绝对路径
+        // 入口文件输出文件名
+        filename: &quot;main.js&quot;,
+        // 禁止箭头函数
+        environment: &#123;
+            arrowFunction: false,
+        &#125;,
+        // 自动清空上次打包的内容
+        // 先清空path目录，再进行打包
+        clean: true,
+    &#125;,
+    // 加载器
+    module: &#123;
+        rules: [
+            // 加载器配置
+            &#123;
+                test: /\.js$/,
+                exclude: /node_modules/, // 排除node_modules代码不编译
+                loader: &quot;babel-loader&quot;,
+              &#125;,
+        ],
+    &#125;,
+    // 插件
+    plugins: [
+        // 插件配置
+    ],
+    // 模式
+    mode: &quot;development&quot;,
+&#125;
+</code></pre>
+<pre><code class="js">// babel.config.js
+
+module.exports = &#123;
+  presets: [&quot;@babel/preset-env&quot;], // 智能预设
+&#125;;
+</code></pre>
+<h2 id="配置示例"><a href="#配置示例" class="headerlink" title="配置示例"></a>配置示例</h2><ul>
+<li>.eslintrc.js</li>
+</ul>
+<pre><code class="js">module.exports = &#123;
+    // 继承 Eslint 官方规则
+    extends: [&quot;eslint:recommended&quot;],
+    // 设置环境
+    env: &#123;
+        node: true, // 启用node中全局变量
+        browser: true, // 启用浏览器中全局变量
+    &#125;,
+    // 设置解析选项
+    parserOptions: &#123;
+        ecmaVersion: 6, // 设置ES语法版本
+        sourceType: &quot;module&quot;, // 设置模块化语法
+    &#125;,
+    rules: &#123;
+        &quot;no-var&quot;: 2, // 不能使用 var 定义变量 2--‘error’
+    &#125;,
+&#125;;
+</code></pre>
+<ul>
+<li>babel.config.js</li>
+</ul>
+<pre><code class="js">module.exports = &#123;
+    presets: [&quot;@babel/preset-env&quot;],
+&#125;;
+</code></pre>
+<ul>
+<li>package.json</li>
+</ul>
+<pre><code class="json">&#123;
+  &quot;name&quot;: &quot;webpack_code&quot;,
+  &quot;version&quot;: &quot;1.0.0&quot;,
+  &quot;description&quot;: &quot;&quot;,
+  &quot;main&quot;: &quot;./src/main.js&quot;,
+  &quot;scripts&quot;: &#123;
+    &quot;start&quot;: &quot;npm run dev&quot;,
+    &quot;dev&quot;: &quot;webpack serve --config ./config/webpack.dev.js&quot;,
+    &quot;bulid&quot;: &quot;webpack --config ./config/webpack.prod.js&quot;
+  &#125;,
+  &quot;keywords&quot;: [],
+  &quot;author&quot;: &quot;&quot;,
+  &quot;license&quot;: &quot;ISC&quot;,
+  &quot;devDependencies&quot;: &#123;
+    &quot;@babel/core&quot;: &quot;^7.21.0&quot;,
+    &quot;@babel/preset-env&quot;: &quot;^7.20.2&quot;,
+    &quot;babel-loader&quot;: &quot;^9.1.2&quot;,
+    &quot;css-loader&quot;: &quot;^6.7.3&quot;,
+    &quot;css-minimizer-webpack-plugin&quot;: &quot;^4.2.2&quot;,
+    &quot;eslint&quot;: &quot;^8.35.0&quot;,
+    &quot;eslint-webpack-plugin&quot;: &quot;^4.0.0&quot;,
+    &quot;html-webpack-plugin&quot;: &quot;^5.5.0&quot;,
+    &quot;less&quot;: &quot;^4.1.3&quot;,
+    &quot;less-loader&quot;: &quot;^11.1.0&quot;,
+    &quot;mini-css-extract-plugin&quot;: &quot;^2.7.3&quot;,
+    &quot;postcss&quot;: &quot;^8.4.21&quot;,
+    &quot;postcss-loader&quot;: &quot;^7.0.2&quot;,
+    &quot;postcss-preset-env&quot;: &quot;^8.0.1&quot;,
+    &quot;sass&quot;: &quot;^1.58.3&quot;,
+    &quot;sass-loader&quot;: &quot;^13.2.0&quot;,
+    &quot;style-loader&quot;: &quot;^3.3.1&quot;,
+    &quot;stylus-loader&quot;: &quot;^7.1.0&quot;,
+    &quot;webpack&quot;: &quot;^5.75.0&quot;,
+    &quot;webpack-cli&quot;: &quot;^5.0.1&quot;,
+    &quot;webpack-dev-server&quot;: &quot;^4.11.1&quot;
+  &#125;,
+  &quot;browserslist&quot;: [
+    &quot;last 2 version&quot;,
+    &quot;&gt; 1%&quot;,
+    &quot;not dead&quot;
+  ]
+&#125;
+</code></pre>
+<h3 id="开发模式示例"><a href="#开发模式示例" class="headerlink" title="开发模式示例"></a>开发模式示例</h3><ul>
+<li>.&#x2F;config&#x2F;webpack.dev.js</li>
+</ul>
+<pre><code class="js">const path = require(&#39;path&#39;);
+const HtmlWebpackPlugin = require(&#39;html-webpack-plugin&#39;);
+const MiniCssExtractPlugin = require(&#39;mini-css-extract-plugin&#39;);
+const ESLintWebpackPlugin = require(&#39;eslint-webpack-plugin&#39;);
+
+const getStyleLoaders = (pre) =&gt; [
+    // 执行顺序：从下到上/从右到左（顺序不可乱）
+    MiniCssExtractPlugin.loader, // 通过link引入css文件
+    &#39;css-loader&#39;, // 将css资源编译成commonjs的模块到js中
+    &#123;
+        // css兼容性处理
+        loader: &#39;postcss-loader&#39;,
+        options: &#123;
+            postcssOptions: &#123;
+                plugins: [
+                    &#39;postcss-preset-env&#39;, // 智能预设
+                ]
+            &#125;
+        &#125;
+    &#125;,
+    pre // 预处理器loader, 将预处理资源编译成css资源
+].filter(Boolean);
+
+module.exports = &#123;
+    // 入口
+    entry: &quot;./src/main.js&quot;,  // 相对路径
+    // 输出
+    output: &#123;
+        // 所有文件输出路径
+        path: path.resolve(__dirname, &#39;../dist&#39;),  // 绝对路径
+        // 入口文件输出文件名
+        filename: &quot;main.js&quot;,
+        // 禁止箭头函数
+        environment: &#123;
+            arrowFunction: false,
+        &#125;,
+    &#125;,
+    // 加载器
+    module: &#123;
+        rules: [
+            // 加载器配置
+            &#123;
+                test: /\.css$/,  // 正则匹配文件名，只检测匹配到的文件
+                use: getStyleLoaders(),
+            &#125;,
+            &#123;
+                test: /\.less$/,
+                use: getStyleLoaders(&#39;less-loader&#39;),
+            &#125;,
+            &#123;
+                test: /\.s[ac]ss$/,
+                use: getStyleLoaders(&#39;sass-loader&#39;),
+            &#125;,
+            &#123;
+                test: /\.styl$/,
+                use: getStyleLoaders(&#39;stylus-loader&#39;),
+            &#125;,
+
+            &#123;
+                test: /\.(ttf|woff2?|mp3|mp4|avi|mkv)$/,
+                type: &quot;asset/resource&quot;,
+                generator: &#123;
+                    // 匹配到的文件输出路径
+                    // 将文件输出到 static/media 目录中
+                    // 将图片文件命名 [hash:10][ext][query]
+                    // [hash:10]: hash值取10位
+                    // [ext]: 使用之前的文件扩展名
+                    // [query]: 添加之前的query参数
+                    filename: &#39;static/media/[hash:10][ext][query]&#39;,
+                &#125;
+            &#125;,
+            &#123;
+                test: /\.svg$/,
+                type: &quot;asset/inline&quot;,
+            &#125;,
+            &#123;
+                test: /\.(png|jpe?g|gif|bmp)$/,
+                type: &quot;asset&quot;,
+                parser: &#123;
+                    dataUrlCondition: &#123;
+                        maxSize: 10 * 1024 // 小于10kb的图片会被base64处理,即data URI
+                    &#125;
+                &#125;,
+                generator: &#123;
+                    // 匹配到的文件输出路径
+                    // 将文件输出到 static/images 目录中
+                    // 将图片文件命名 [hash:10][ext][query]
+                    // [hash:10]: hash值取10位
+                    // [ext]: 使用之前的文件扩展名
+                    // [query]: 添加之前的query参数
+                    filename: &#39;static/images/[hash:10][ext][query]&#39;,
+                &#125;,
+            &#125;,
+            &#123;
+                test: /\.txt$/,
+                type: &quot;asset/resource&quot;,
+            &#125;,
+
+            &#123;
+                test: /\.js$/,
+                exclude: /node_modules/, // 排除node_modules代码不编译
+                loader: &quot;babel-loader&quot;,
+            &#125;,
+        ]
+    &#125;,
+    // 插件
+    plugins: [
+        // 插件配置
+
+        // 以 public/index.html 为模板创建文件
+        // 新的html文件有两个特点：1. 内容和源文件一致 2. 自动引入打包生成的js等资源
+        new HtmlWebpackPlugin(&#123;
+            template: path.resolve(__dirname, &#39;../public/index.html&#39;),
+        &#125;),
+
+        // 提取css成单独文件
+        new MiniCssExtractPlugin(&#123;
+            // 定义输出文件名和目录
+            filename: &#39;static/css/main.css&#39;,
+        &#125;),
+
+        // 使用ESLint进行js代码格式检查
+        new ESLintWebpackPlugin(&#123;
+            // 指定检查文件的根目录
+            context: path.resolve(__dirname, &quot;../src&quot;),
+        &#125;),
+    ],
+    // 模式
+    mode: &quot;development&quot;,
+    // 开发服务器
+    devServer: &#123;
+        host: &quot;localhost&quot;, // 启动服务器域名
+        port: &quot;3000&quot;, // 启动服务器端口号
+        open: true, // 是否自动打开浏览器
+    &#125;,
+&#125;
+</code></pre>
+<h3 id="生产模式示例"><a href="#生产模式示例" class="headerlink" title="生产模式示例"></a>生产模式示例</h3><ul>
+<li>.&#x2F;config&#x2F;webpack.prod.js</li>
+</ul>
+<pre><code class="js">const path = require(&#39;path&#39;);
+const HtmlWebpackPlugin = require(&#39;html-webpack-plugin&#39;);
+const MiniCssExtractPlugin = require(&#39;mini-css-extract-plugin&#39;);
+const CssMinimizerPlugin = require(&#39;css-minimizer-webpack-plugin&#39;);
+const ESLintWebpackPlugin = require(&#39;eslint-webpack-plugin&#39;);
+
+const getStyleLoaders = (pre) =&gt; [
+    // 执行顺序：从下到上/从右到左（顺序不可乱）
+    MiniCssExtractPlugin.loader, // 通过link引入css文件
+    &#39;css-loader&#39;, // 将css资源编译成commonjs的模块到js中
+    &#123;
+        // css兼容性处理
+        loader: &#39;postcss-loader&#39;,
+        options: &#123;
+            postcssOptions: &#123;
+                plugins: [
+                    &#39;postcss-preset-env&#39;, // 智能预设
+                ]
+            &#125;
+        &#125;
+    &#125;,
+    pre // 预处理器loader, 将预处理资源编译成css资源
+].filter(Boolean);
+
+module.exports = &#123;
+    // 入口
+    entry: &quot;./src/main.js&quot;,  // 相对路径
+    // 输出
+    output: &#123;
+        // 所有文件输出路径
+        path: path.resolve(__dirname, &#39;../dist&#39;),  // 绝对路径
+        // 入口文件输出文件名
+        filename: &quot;main.js&quot;,
+        // 禁止箭头函数
+        environment: &#123;
+            arrowFunction: false,
+        &#125;,
+        // 自动清空上次打包的内容
+        // 先清空path目录，再进行打包
+        clean: true,
+    &#125;,
+    // 加载器
+    module: &#123;
+        rules: [
+            // 加载器配置
+            &#123;
+                test: /\.css$/,  // 正则匹配文件名，只检测匹配到的文件
+                use: getStyleLoaders(),
+            &#125;,
+            &#123;
+                test: /\.less$/,
+                use: getStyleLoaders(&#39;less-loader&#39;),
+            &#125;,
+            &#123;
+                test: /\.s[ac]ss$/,
+                use: getStyleLoaders(&#39;sass-loader&#39;),
+            &#125;,
+            &#123;
+                test: /\.styl$/,
+                use: getStyleLoaders(&#39;stylus-loader&#39;),
+            &#125;,
+
+            &#123;
+                test: /\.(ttf|woff2?|mp3|mp4|avi|mkv)$/,
+                type: &quot;asset/resource&quot;,
+                generator: &#123;
+                    // 匹配到的文件输出路径
+                    // 将文件输出到 static/media 目录中
+                    // 将图片文件命名 [hash:10][ext][query]
+                    // [hash:10]: hash值取10位
+                    // [ext]: 使用之前的文件扩展名
+                    // [query]: 添加之前的query参数
+                    filename: &#39;static/media/[hash:10][ext][query]&#39;,
+                &#125;
+            &#125;,
+            &#123;
+                test: /\.svg$/,
+                type: &quot;asset/inline&quot;,
+            &#125;,
+            &#123;
+                test: /\.(png|jpe?g|gif|bmp)$/,
+                type: &quot;asset&quot;,
+                parser: &#123;
+                    dataUrlCondition: &#123;
+                        maxSize: 10 * 1024 // 小于10kb的图片会被base64处理,即data URI
+                    &#125;
+                &#125;,
+                generator: &#123;
+                    // 匹配到的文件输出路径
+                    // 将文件输出到 static/images 目录中
+                    // 将图片文件命名 [hash:10][ext][query]
+                    // [hash:10]: hash值取10位
+                    // [ext]: 使用之前的文件扩展名
+                    // [query]: 添加之前的query参数
+                    filename: &#39;static/images/[hash:10][ext][query]&#39;,
+                &#125;,
+            &#125;,
+            &#123;
+                test: /\.txt$/,
+                type: &quot;asset/resource&quot;,
+            &#125;,
+
+            &#123;
+                test: /\.js$/,
+                exclude: /node_modules/, // 排除node_modules代码不编译
+                loader: &quot;babel-loader&quot;,
+            &#125;,
+        ]
+    &#125;,
+    // 插件
+    plugins: [
+        // 插件配置
+
+        // 以 public/index.html 为模板创建文件
+        // 新的html文件有两个特点：1. 内容和源文件一致 2. 自动引入打包生成的js等资源
+        new HtmlWebpackPlugin(&#123;
+            template: path.resolve(__dirname, &#39;../public/index.html&#39;),
+        &#125;),
+
+        // 提取css成单独文件
+        new MiniCssExtractPlugin(&#123;
+            // 定义输出文件名和目录
+            filename: &#39;static/css/main.css&#39;,
+        &#125;),
+
+        // 压缩css
+        new CssMinimizerPlugin(),
+
+        // 使用ESLint进行js代码格式检查
+        new ESLintWebpackPlugin(&#123;
+            // 指定检查文件的根目录
+            context: path.resolve(__dirname, &quot;../src&quot;),
+        &#125;),
+    ],
+    // 模式
+    mode: &quot;production&quot;,
+&#125;
+</code></pre>
+
+  </div>
+  <div id="gitalk-container"></div>
+</div>
+
+<script>
+  
+Fancybox.bind('[data-fancybox="fancybox-gallery-img"]', {
+  dragToClose: true,
+  Toolbar: true,
+  closeButton: "top",
+  Image: {
+    zoom: true,
+  },
+  on: {
+    initCarousel: (fancybox) => {
+      const slide = fancybox.Carousel.slides[fancybox.Carousel.page];
+      fancybox.$container.style.setProperty(
+        "--bg-image",
+        `url("${slide.$thumb.src}")`
+      );
+    },
+    "Carousel.change": (fancybox, carousel, to, from) => {
+      const slide = carousel.slides[to];
+      fancybox.$container.style.setProperty(
+        "--bg-image",
+        `url("${slide.$thumb.src}")`
+      );
+    },
+  },
+});
+</script>
+
+<style>
+    #noneimg img {
+        display: none;
+        z-index: 9999;
+        /* width: 600px !important; */
+        min-width: 0%;
+        max-width: 90%;
+        max-height: 80%;
+        border-radius: 0px;
+        position: fixed;
+        box-shadow: 0 0 0px #c3c3c300 !important;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        margin: auto !important;
+    }
+
+    @media screen and (max-width:600px) {
+        #noneimg img {
+            max-width: 88%
+        }
+    }
+</style>
+
+    <div class="post-paging">
+    
+
+    
+    <a href="/2021/07/23/markdown/">
+        <div class="post-paging-next">
+            <span>下一篇</span>
+            <p>Markdown</p>
+        </div>
+    </a>
+    
+</div>
+</div>
+		
+<div class="footer">
+	<div class="Copyright">
+		©2023 By 方永魔迹. 主题：<a
+			style="text-decoration: none;display: contents; color: #898F9F;"
+			target="_blank" rel="noopener" href="https://github.com/79e/hexo-theme-quiet">Quiet</a>
+	</div>
+	<div class="contact">
+		
+		<a target="_blank" rel="noopener" href="https://github.com/79E/hexo-theme-quiet">
+			<img src="https://cdn.jsdelivr.net/gh/duogongneng/MyBlogImg/imggithub.png" alt="Quiet主题">
+		</a>
+		
+	</div>
+</div>
+
+<script src="/js/gotop.js"></script>
+
+
+<style type="text/css">
+    @media screen and (min-width: 600px) {
+        .goTop>span {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            opacity: 0.8;
+            background: rgba(18, 24, 58, 0.06);
+            text-align: center;
+            transition: border .5s;
+            border: 1px solid rgba(18, 24, 58, 0.06);
+
+            -moz-transition: border .5s;
+            /* Firefox 4 */
+            -webkit-transition: border .5s;
+            /* Safari 和 Chrome */
+            -o-transition: border .5s;
+            /* Opera */
+        }
+
+        .goTop>span:hover {
+            border: 1px solid #6680B3;
+        }
+
+
+        .goTop {
+            position: fixed;
+            right: 30px;
+            bottom: 80px;
+        }
+
+        .goTop>span>svg {
+            width: 20px;
+            height: 20px;
+            opacity: 0.7;
+        }
+
+    }
+
+    @media screen and (max-width: 600px) {
+        .goTop {
+            display: none;
+        }
+    }
+</style>
+<div class="goTop" id="js-go_top">
+    <span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+            <g>
+                <path d="M13 12v8h-2v-8H4l8-8 8 8z"></path>
+            </g>
+        </svg>
+    </span>
+</div>
+<script>
+    $( '#js-go_top' )
+	.gotoTop( {
+		offset: 500,
+		speed: 300,
+		animationShow: {
+			'transform': 'translate(0,0)',
+			'transition': 'transform .5s ease-in-out'
+		},
+		animationHide: {
+			'transform': 'translate(100px,0)',
+			'transition': 'transform .5s ease-in-out'
+		}
+	} );
+</script>
+
+
+<!-- Baidu Analytics -->
+<script defer>
+    var _hmt = _hmt || [];
+    (function () {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?bdd9b86e96b1aa66ed8efc46bd421ed6";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+
+    <!-- Gitalk -->
+    <script>
+        const data = '{"clientID":"76bcfeb7593bc0a00d08","clientSecret":"769c2fef0e80d1fcd6fb916bd0722e599c0fe2fc","repo":"https://github.com/FXFFFXXX/FXFFFXXX-DIS.git","owner":"FXFFFXXX","admin":"FXFFFXXX"}'
+        const gitalk = new Gitalk({
+            ...JSON.parse( data),
+            id:location.pathname,
+            distractionFreeMode:false
+        })
+        
+        if(Boolean('true')){
+            gitalk.render('gitalk-container')
+        }
+    </script>
+
+<script>
+	console.log('\n %c Hexo-Quiet 主题 %c https://github.com/79e/hexo-theme-quiet \n', 'color: #fadfa3; background: #030307; padding:5px 0;', 'background: #fadfa3; padding:5px 0;')
+</script>
+	</body>
+</html>
+
