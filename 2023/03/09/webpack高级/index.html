@@ -852,7 +852,228 @@ module.exports = &#123;
     &#125;,
 &#125;;
 </code></pre>
-<h2 id="优化代码运行性能"><a href="#优化代码运行性能" class="headerlink" title="优化代码运行性能"></a>优化代码运行性能</h2><h3 id="Code-Split-代码分割"><a href="#Code-Split-代码分割" class="headerlink" title="Code Split(代码分割)"></a>Code Split(代码分割)</h3>
+<h2 id="优化代码运行性能"><a href="#优化代码运行性能" class="headerlink" title="优化代码运行性能"></a>优化代码运行性能</h2><h3 id="Code-Split-代码分割"><a href="#Code-Split-代码分割" class="headerlink" title="Code Split(代码分割)"></a>Code Split(代码分割)</h3><p>详见<a target="_blank" rel="noopener" href="https://fxfffxxx.github.io/2023/03/13/webpack%E4%BC%98%E5%8C%96%E4%B9%8B%E4%BB%A3%E7%A0%81%E5%88%86%E5%89%B2/">webpack优化之代码分割</a></p>
+<h3 id="Preload-x2F-Prefetch-预加载"><a href="#Preload-x2F-Prefetch-预加载" class="headerlink" title="Preload &#x2F; Prefetch(预加载)"></a>Preload &#x2F; Prefetch(预加载)</h3><h4 id="场景-9"><a href="#场景-9" class="headerlink" title="场景"></a>场景</h4><ul>
+<li>在Code Split(代码分割)中我们采用了按需加载的方式来提升首屏渲染性能</li>
+<li>在此情况下，当用户访问被按需加载处理过的页面或功能时，如果资源体积较大，那么用户会感觉到明显卡顿效果</li>
+</ul>
+<h4 id="方案-9"><a href="#方案-9" class="headerlink" title="方案"></a>方案</h4><ul>
+<li>首先加载当前页面所需资源，按需加载资源暂不加载</li>
+<li>当前页面所需资源加载完成后，再加载后续需要使用的资源</li>
+<li>使用<code>@vue/preload-webpack-plugin</code>插件，并进行相关配置</li>
+<li>有<code>Preload / Prefetch</code>两种预加载方式，它们都只会加载资源并缓存，并不执行<ul>
+<li><code>Preload</code>：告诉浏览器立即加载资源，只能加载当前页面需要使用的资源，加载优先级高，兼容性较好</li>
+<li><code>Prefetch</code>：告诉浏览器在空闲时才开始加载资源，可以加载当前页面资源，也可以加载下一个页面需要使用的资源，兼容性较差</li>
+</ul>
+</li>
+</ul>
+<h4 id="使用-9"><a href="#使用-9" class="headerlink" title="使用"></a>使用</h4><pre><code class="js">module.exports = &#123;
+    /*
+        其他配置项
+    */
+    
+    // 插件
+    plugins: [
+        // 插件配置
+        
+        /*
+            其他插件配置
+        */
+
+        // 预加载
+        new PreloadWebpackPlugin(&#123;
+            rel: &#39;preload&#39;, // 有preload / prefetch两种取值，在prefetch下不可设置as
+            as: &#39;script&#39;, // 作为script标签进行加载
+        &#125;)
+    ],
+&#125;;
+</code></pre>
+<h3 id="Network-Cache"><a href="#Network-Cache" class="headerlink" title="Network Cache"></a>Network Cache</h3><h4 id="场景-1"><a href="#场景-1" class="headerlink" title="场景.1"></a>场景.1</h4><ul>
+<li>在开发中通常会对静态资源进行缓存优化，浏览器第二次请求资源就能读取缓存，速度更快</li>
+<li>如果修改代码前后输出的文件名是一样的，将来发布新版本，因为文件名没有变化导致浏览器会直接读取缓存，不会加载新资源，项目也就没法更新</li>
+</ul>
+<h4 id="方案-1"><a href="#方案-1" class="headerlink" title="方案.1"></a>方案.1</h4><ul>
+<li>可以在文件名上添加哈希值来达到文件名始终一样的场景，常见的有三种哈希值，这里我们使用contenthash<ul>
+<li>fullhash(webpack4 是 hash): 每次修改任何一个文件，所有文件名的 hash 至都将改变。所以一旦修改了任何一个文件，整个项目的文件缓存都将失效。</li>
+<li>chunkhash: 根据不同的入口文件(Entry)进行依赖文件解析、构建对应的 chunk，生成对应的哈希值。</li>
+<li>contenthash: 根据文件内容生成 hash 值，只有文件内容变化了，hash 值才会变化，并且只会修改该文件的hash值，每个文件 的hash 值都是唯一不重复的。</li>
+</ul>
+</li>
+</ul>
+<h4 id="场景-2"><a href="#场景-2" class="headerlink" title="场景.2"></a>场景.2</h4><ul>
+<li>使用contenthash时，会根据文件内容的变化来改变该文件的hash值，</li>
+<li>如果有其他文件引入了该文件时，其他文件没有进行修改</li>
+<li>打包时由于引入路径中的文件名发生了变化，也会认为文件内容发生了改变，进而导致其他文件hash值改变，缓存失效</li>
+</ul>
+<h4 id="方案-2"><a href="#方案-2" class="headerlink" title="方案.2"></a>方案.2</h4><ul>
+<li>在<code>optimization</code>中配置<code>runtimeChunk</code>，来避免文件发生改变时，进入该文件的文件由于引入路径的关系跟着改变</li>
+<li>将文件的hash值交给<code>runtimeChunk</code>, 来保存文件的 hash 值、保存的hash值与文件的关系，整个文件体积较小，变化导致重新请求的代价也较小。</li>
+</ul>
+<h4 id="使用-10"><a href="#使用-10" class="headerlink" title="使用"></a>使用</h4><pre><code class="js">module.exports = &#123;
+    /*
+        其他配置项
+    */
+    // 输出
+    output: &#123;
+        // 所有文件输出路径
+        path: path.resolve(__dirname, &#39;../dist&#39;),  // 绝对路径
+        // 入口文件输出文件名, 该值同样是splitChunks的文件输出命名格式
+        // [name]是webpack命名规则，使用chunk的name作为输出bundle的文件名。
+        // module、chunk、bundle是什么？打包前的资源是module, 打包完成资源是chunk，最后输出的是bundle
+        // 这里的name是entry中的键名，和文件名无关，即front和manage。
+        // contenthash是据文件内容生成 hash 值，随着内容的改变而改变
+        // filename: &quot;main.js&quot;,
+        filename: &quot;static/js/[name].[contenthash:8].js&quot;,
+        chunkFilename: &quot;static/js/chunk/[name].[contenthash:8].chunk.js&quot;, // 此处的name可读取魔法命名的值
+        assetModuleFilename: &quot;static/media/[hash:8].[ext][query]&quot;,
+        // 禁止箭头函数
+        environment: &#123;
+            arrowFunction: false,
+        &#125;,
+        clean: true,
+    &#125;,
+    // 优化
+    optimization: &#123;
+        /*
+            其他优化配置
+        */
+
+        // 提取runtime文件, 来管理hash值与文件的关系
+        runtimeChunk: &#123;
+            name: (entrypoint) =&gt; `runtime~$&#123;entrypoint.name&#125;`, // runtime文件命名规则, 最终作为name值在output中的filename下命名
+        &#125;,
+    &#125;,
+&#125;;
+</code></pre>
+<h3 id="Core-js"><a href="#Core-js" class="headerlink" title="Core-js"></a>Core-js</h3><h4 id="场景-10"><a href="#场景-10" class="headerlink" title="场景"></a>场景</h4><ul>
+<li>babel的智能预设<code>@babel/preset-env</code>能处理一般情况下的es6兼容性问题</li>
+<li>如果使用es6以上语法或者是智能预设不处理的语法时，如 <code>async /await</code>、<code>Promise</code>等等，将仍然存在兼容性问题</li>
+</ul>
+<h4 id="方案-10"><a href="#方案-10" class="headerlink" title="方案"></a>方案</h4><ul>
+<li><p>使用 core-js，来处理es6及以上的语法特性</p>
+</li>
+<li><p>core-js 是专门用来做 ES6 以及以上 API 的 <code>polyfill</code>, 即补丁</p>
+</li>
+<li><p>可以直接在代码中导入整个补丁，也可按需加载我们使用的补丁，但都比较麻烦</p>
+</li>
+<li><p>可以在babel配置文件中进行配置，根据我们代码中使用的语法，来自动按需加载相应的 <code>polyfill</code> 了</p>
+</li>
+<li><p>可能新语法eslint会检查报错，如使用<code>Promise</code>时，需在eslint中配置es6全局环境</p>
+</li>
+</ul>
+<h4 id="使用-11"><a href="#使用-11" class="headerlink" title="使用"></a>使用</h4><p>.&#x2F;eslintrc.js</p>
+<pre><code class="js">module.exports = &#123;
+    // 继承 Eslint 官方规则
+    extends: [&quot;eslint:recommended&quot;],
+    // 设置环境
+    env: &#123;
+        node: true, // 启用node中全局变量
+        browser: true, // 启用浏览器中全局变量
+        es6: true, // 启用es6中全局变量
+    &#125;,
+    // 设置解析选项
+    parserOptions: &#123;
+        ecmaVersion: 11, // 设置ES语法版本, es11才有动态导入语法
+        sourceType: &quot;module&quot;, // 设置模块化语法
+        allowImportExportEverywhere: true,
+    &#125;,
+    rules: &#123;
+        &quot;no-var&quot;: 2, // 不能使用 var 定义变量 2--‘error’
+    &#125;,
+&#125;;
+</code></pre>
+<p>.&#x2F;babel.config.js</p>
+<pre><code class="js">module.exports = &#123;
+    presets: [
+        [
+            &quot;@babel/preset-env&quot;, // 智能预设
+            // 按需加载core-js的polyfill
+            &#123; useBuiltIns: &quot;usage&quot;, corejs: &#123; version: &quot;3&quot;, proposals: true &#125; &#125;,
+        ]
+    ],
+&#125;;
+</code></pre>
+<h3 id="PWA-渐进式网络应用程序"><a href="#PWA-渐进式网络应用程序" class="headerlink" title="PWA(渐进式网络应用程序)"></a>PWA(渐进式网络应用程序)</h3><h4 id="场景-11"><a href="#场景-11" class="headerlink" title="场景"></a>场景</h4><ul>
+<li>开发 Web App 项目时，项目一旦处于网络离线情况，就无法访问了</li>
+<li>希望能够给项目提供离线体验</li>
+</ul>
+<h4 id="方案-11"><a href="#方案-11" class="headerlink" title="方案"></a>方案</h4><ul>
+<li>使用<code>workbox-webpack-plugin</code>插件来配置注册Service Worker，来实现PWA(渐进式网络应用程序)</li>
+<li><code>workbox-webpack-plugin</code>插件需在webpack配置文件中进行配置</li>
+<li>在所有入口(如果是多入口)文件下注册 <code>Service Worker</code></li>
+<li>需部署在服务器上才可看到效果，如开发服务器</li>
+</ul>
+<h4 id="使用-12"><a href="#使用-12" class="headerlink" title="使用"></a>使用</h4><p>.&#x2F;config&#x2F;webpack.dev.js</p>
+<pre><code class="js">module.exports = &#123;
+    /*
+        其他配置项
+    */
+    
+    // 插件
+    plugins: [
+        // 插件配置
+        
+        /*
+            其他插件配置
+        */
+
+        // 配置ServiceWorkers
+        new WorkboxPlugin.GenerateSW(&#123;
+            // 这些选项帮助快速启用 ServiceWorkers
+            // 不允许遗留任何“旧的” ServiceWorkers
+            clientsClaim: true,
+            skipWaiting: true,
+        &#125;)
+    ],
+    // 模式
+    mode: &quot;development&quot;,
+    // 开发服务器
+    devServer: &#123;
+        host: &quot;localhost&quot;, // 启动服务器域名
+        port: &quot;3000&quot;, // 启动服务器端口号
+        open: true, // 是否自动打开浏览器
+        hot: true, // 是否开启HMR
+    &#125;,
+&#125;;
+</code></pre>
+<p>.&#x2F;src&#x2F;main.js</p>
+<pre><code class="js">import &#123; sum, count &#125; from &#39;./js/math&#39;;
+
+console.log(count(3, 2));
+console.log(sum(1, 2, 3, 4));
+
+let timer = setTimeout(() =&gt; &#123;
+    // eslint会对动态导入语法报错，需要修改eslint配置文件
+    // 下面的 `/* webpackChunkName: &quot;tip&quot; */`是webpack给动态导入模块chunk命名的方式, 为webpack魔法命名
+    // &quot;tip&quot;将来就会作为[name]的值显示。
+    import(/* webpackChunkName: &quot;tip&quot; */&#39;./js/tip&#39;).then((m) =&gt; &#123;
+        m.default();
+        clearTimeout(timer);
+        timer = null;
+    &#125;)
+&#125;, 3000);
+
+// 判断是否支持HMR功能
+if (module.hot) &#123;
+    // 给相应模块添加HMR
+    // module.hot.accept(&#39;./js/count&#39;, () =&gt; console.log(&#39;count.js changed&#39;));
+    // module.hot.accept(&#39;./js/sum&#39;, () =&gt; console.log(&#39;sum.js changed&#39;));
+    module.hot.accept([&#39;./js/math&#39;, &#39;./js/tip&#39;], () =&gt; console.log(&#39;math.js or tip.js changed&#39;));
+&#125;
+
+// 注册 Service Worker
+if (&#39;serviceWorker&#39; in navigator) &#123;
+    window.addEventListener(&#39;load&#39;, () =&gt; &#123;
+        // 此处应为相对路径
+        navigator.serviceWorker.register(&#39;service-worker.js&#39;).then(registration =&gt; &#123;
+            console.log(&#39;SW registered: &#39;, registration);
+        &#125;).catch(registrationError =&gt; &#123;
+            console.log(&#39;SW registration failed: &#39;, registrationError);
+        &#125;);
+    &#125;);
+&#125;
+</code></pre>
+
   </div>
   <div id="gitalk-container"></div>
 </div>
