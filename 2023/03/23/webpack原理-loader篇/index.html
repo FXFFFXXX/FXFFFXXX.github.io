@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		
+<title>webpack原理-loader篇-方永魔迹</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="shortcut icon" type="image/x-icon" href="/image/favicon.ico">
+
+<link rel="stylesheet" href="/css/index.css">
+
+
+
+<meta name="keywords" content="webpack,webpack5,打包工具,webpack原理,loader,">
+<meta name="description" content="webpack原理">
+
+
+<script src="/js/jquery.min.js"></script>
+
+
+<script src="/js/index.js"></script>
+
+
+<script src="/js/fancybox.umd.js"></script>
+
+
+<script src="/js/fancybox-images.js"></script>
+
+
+<script src="/js/gitalk.min.js"></script>
+
+
+<script src="/js/hljs.min.js"></script>
+ 
+<script>hljs.highlightAll();</script>
+
+	<meta name="generator" content="Hexo 6.3.0"></head>
+
+	<body>
+		
+	<div class="header">
+		<div class="header-top" id="header-top">
+			<div class="h-left">
+				<a href="/">
+					<img src="/image/logo.png" alt="Quiet">
+				</a>
+			</div>
+			<div class="h-right">
+				<ul>
+					
+						
+								<li>
+									<a href="/">
+										HOME
+									</a>
+									<span class="dot"></span>
+								</li>
+								
+									
+						
+								<li>
+									<a href="/archives">
+										ARCHIVE
+									</a>
+									<span class="dot"></span>
+								</li>
+								
+									
+						
+								<li>
+									<a href="/categories">
+										CATEGORIES
+									</a>
+									<span class="dot"></span>
+								</li>
+								
+									
+						
+								<li>
+									<a href="/tags">
+										TAGS
+									</a>
+									<span class="dot"></span>
+								</li>
+								
+									
+						
+								<li>
+									<a href="/links">
+										LINKS
+									</a>
+									<span class="dot"></span>
+								</li>
+								
+									
+						
+								<li>
+									<a href="/about">
+										ABOUT
+									</a>
+									<span class="dot"></span>
+								</li>
+								
+									
+				</ul>
+			</div>
+			<div class="h-right-close">
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+					<path fill="none" d="M0 0h24v24H0z" />
+					<path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z" fill="rgba(68,68,68,1)" />
+				</svg>
+			</div>
+		</div>
+	</div>
+	<div class="sidebar">
+    <div class="topo">
+        <h2>方永魔迹</h2>
+    </div>
+    <ul>
+        
+        <li>
+            <a href="/">HOME</a>
+        </li>
+        
+        <li>
+            <a href="/archives">ARCHIVE</a>
+        </li>
+        
+        <li>
+            <a href="/categories">CATEGORIES</a>
+        </li>
+        
+        <li>
+            <a href="/tags">TAGS</a>
+        </li>
+        
+        <li>
+            <a href="/links">LINKS</a>
+        </li>
+        
+        <li>
+            <a href="/about">ABOUT</a>
+        </li>
+        
+    </ul>
+    <div class="my_foot">
+        
+        <a target="_blank" rel="noopener" href="https://github.com/79E/hexo-theme-quiet">
+            <img src="https://cdn.jsdelivr.net/gh/duogongneng/MyBlogImg/imggithub.png" alt="Quiet主题">
+        </a>
+        
+    </div>
+</div>
+<div class='shelter'>
+</div>
+<style>
+    .shelter{
+        background-color: #333;
+        opacity:0.5;
+        cursor: pointer;
+        display: none; 
+        position: fixed;
+        left: 0;
+        top: 0; 
+        right: 0;
+        bottom: 0;
+        z-index: 1998;
+    }
+    .sidebar {
+        width: 66%;
+        height: 100%;
+        position: fixed;
+        top: 0;
+        right: -100%;
+        bottom: 0;
+        background: #fff;
+        z-index: 1999;
+        text-align: center;
+        box-shadow: -6px 0 20px rgba(98, 94, 94, .815);
+    }
+
+    .topo {
+        width: 100%;
+        height: 200px;
+        background: url(https://api.ixiaowai.cn/gqapi/gqapi.php) no-repeat;
+        background-size: 100% 100%;
+        position: relative;
+        display: flex;
+        align-items: flex-end
+    }
+
+    .topo h2 {
+        color: #fff;
+        z-index: 1;
+        position: relative;
+        margin: 0 0 10px 10px;
+        font-size: 1.2em;
+        box-sizing: border-box
+    }
+
+    .topo:before {
+        content: '';
+        background-image: url(/image/pattern.png);
+        background-repeat: repeat;
+        height: 100%;
+        left: 0;
+        position: absolute;
+        top: 0;
+        width: 100%;
+        z-index: 1
+    }
+
+    .sidebar ul {
+        width: 100%;
+        margin-top: 50px
+    }
+
+    .sidebar ul li {
+        height: 50px;
+        list-style: none;
+        font-size: 1.2em;
+        text-align: right;
+        margin-right: 10px
+    }
+
+    .sidebar ul li a {
+        display: grid;
+        color: #5d606a;
+        text-overflow: ellipsis;
+        width: 100%;
+        text-decoration: none
+    }
+
+    .my_foot {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        position: absolute;
+        bottom: 0
+    }
+
+    .my_foot a {
+        text-decoration: none;
+        margin-right: 10px;
+        display: inline-block
+    }
+
+    .my_foot a img {
+        width: 30px;
+        height: 30px
+    }
+</style>
+
+<script>
+    $( function () {
+	$( '.h-right-close>svg' )
+		.click( function () {
+			$( '.sidebar' )
+				.animate( {
+					right: "0"
+				}, 500 );
+			$( '.shelter' )
+				.fadeIn( "slow" )
+		} );
+	$( '.shelter' )
+		.click( function ( e ) {
+			$( '.sidebar' )
+				.animate( {
+					right: "-100%"
+				}, 500 );
+			$( '.shelter' )
+				.fadeOut( "slow" )
+		} )
+} )
+
+</script>
+
+<div class="post">
+    <div class="post-header-background post-header-img"
+    style="background: url('https://api.ixiaowai.cn/gqapi/gqapi.php')" 
+>
+    <div class="post-header-background-content">
+        <ul class="post-header-tag">
+            
+            
+            <li><a href="/tags/webpack">webpack</a></li>
+            
+            <li><a href="/tags/webpack5">webpack5</a></li>
+            
+            <li><a href="/tags/打包工具">打包工具</a></li>
+            
+            <li><a href="/tags/webpack原理">webpack原理</a></li>
+            
+            <li><a href="/tags/loader">loader</a></li>
+            
+            
+        </ul>
+        
+        <h1>webpack原理-loader篇</h1>
+        <div class="post-header-info">
+            <div class="post-header-info-author">
+                
+                    <svg t="1604839279282" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                        xmlns="http://www.w3.org/2000/svg" p-id="2901" width="20" height="20">
+                        <path
+                            d="M513 956.3c-247.7 0-448-200.3-448-448S265.3 66.2 513 66.2s448 200.3 448 448-200.3 442.1-448 442.1z m0-830.9c-212.2 0-388.8 170.7-388.8 388.8C124.2 726.3 294.9 903 513 903c212.2 0 388.8-170.7 388.8-388.8S725.2 125.4 513 125.4z m0 430.2c-94.2 0-170.7-76.5-170.7-170.7S418.8 207.8 513 207.8s170.7 76.5 170.7 170.7S607.2 555.6 513 555.6z m0-289.1c-64.6 0-112 52.8-112 112s47.4 117.9 112 117.9 112-52.8 112-112-47.4-117.9-112-117.9z m0 689.8c-135.7 0-259-58.7-341.9-158.9l-11.8-17.8 11.8-17.8c76.5-117.9 206.2-188.5 347.8-188.5 135.7 0 265 64.6 341.9 182.6l11.8 17.8-11.8 17.8C778 897.1 648.7 956.3 513 956.3zM230.3 773.2C300.9 849.7 406.9 897 513 897c112 0 218.1-47.4 288.6-129.8-70.5-88.2-170.7-135.6-282.7-135.6s-218.1 53.3-288.6 141.6z"
+                            p-id="2902" fill="#ffffff"></path>
+                    </svg>
+                    
+                <span class="post-header-info-author-text"> <a target="_blank" rel="noopener" href="https://fxfffxxx.github.io/about/">方永魔迹</a></span>
+                <div class="post-header-info-author-categories">
+                    
+                         <a href="../../categories/webpack学习/" target="_blank" >webpack学习</a>
+                    
+                </div>
+                <p>2023-03-23 18:03:45</p>
+            </div>
+        </div>
+    </div>
+</div>
+    <div class="post-content" id="content">
+  
+  <div id="article" class="post-content-info">
+    
+
+    <h1 id="webpack原理-loader篇"><a href="#webpack原理-loader篇" class="headerlink" title="webpack原理-loader篇"></a>webpack原理-loader篇</h1><h2 id="loader简介"><a href="#loader简介" class="headerlink" title="loader简介"></a>loader简介</h2><p>loader本质为一个函数，webpack在处理资源时若匹配到laoder，会将处理的资源内容作为参数来调用loader</p>
+<p>webpack会传递给loader三个参数，依次为：</p>
+<ul>
+<li>content：待处理资源的内容或上一个loader处理后的内容</li>
+<li>map：SourceMap源代码映射</li>
+<li>meta：上一个loader传递过来的参数</li>
+</ul>
+<p>简单的loader示例如下(删除控制台日志输出<code>console.log()</code>代码)</p>
+<p>.&#x2F;webpack.config.js</p>
+<pre><code class="js">const path = require(&#39;path&#39;);
+
+const HtmlWebpackPlugin = require(&#39;html-webpack-plugin&#39;);
+
+module.exports = &#123;
+
+    entry: &#39;./src/main.js&#39;,
+    output: &#123;
+
+        path: path.resolve(__dirname, &#39;dist&#39;),
+        filename: &#39;static/js/[name].[contenthash:10].js&#39;,
+        clean: true,
+    &#125;,
+
+    module: &#123;
+        rules: [
+            &#123;
+                test: /\.js$/,
+                // 自定义loader的路径
+                loader: &#39;./loaders/clear_log_loader.js&#39;,
+            &#125;,
+        ],
+    &#125;,
+
+    plugins: [
+
+        new HtmlWebpackPlugin(&#123;
+            template: path.resolve(__dirname, &#39;public/index.html&#39;),
+            filename: &#39;index.[contenthash:10].html&#39;,
+        &#125;),
+    ],
+
+    &#125;,
+
+    mode: &#39;development&#39;,
+&#125;
+</code></pre>
+<p>.&#x2F;loaders&#x2F;clear_log_loader.js</p>
+<pre><code class="js">/*
+    content: 待处理资源的内容或上一个loader处理后的内容
+    map: SourceMap源代码映射
+    meta: 上一个loader传递过来的参数
+    return: 该loader处理后的资源内容，交给下一个loader或者作为该资源输出内容
+*/
+module.exports = function (content, map, meta) &#123;
+    content = content.replace(/console\.log\(.*\);?\r?\n?/g, &#39;&#39;);
+    // 该日志打印会在webpack打包构建处理资源、运行该loader时在控制台打印输出
+    console.log(content)
+    rerturn content;
+&#125;
+</code></pre>
+<h2 id="loader分类"><a href="#loader分类" class="headerlink" title="loader分类"></a>loader分类</h2><h3 id="按执行顺序分"><a href="#按执行顺序分" class="headerlink" title="按执行顺序分"></a>按执行顺序分</h3><blockquote>
+<p>可在每条rule规则中指定enforce的值来配置loader种类为pre、normal、post，默认为normal</p>
+<p>在import路径中显式指定的loader即为inline内联loader</p>
+</blockquote>
+<ul>
+<li>pre前置loader：<code>enforce: &#39;pre&#39;</code></li>
+<li>normal普通loader：<code>enforce: &#39;normal&#39;</code>，enforce的默认值</li>
+<li>inline内联loader：在import路径中显式指定的loader</li>
+<li>post后置loader：<code>enforce: &#39;pre&#39;</code></li>
+</ul>
+<p>执行顺序优先级为<code>pre -&gt; normal -&gt; inline -&gt; post</code>，同种优先级执行顺序为<code>从右到左，从下到上</code>（包括inline loader）</p>
+<blockquote>
+<p>inline loader在import路径中显式指定，loader之间用<code>!</code>分隔，与资源用<code>?modules!</code>分隔，<code>modules</code>代表后面为模块资源，<code>?</code>代表将后面的资源作为参数交给loader处理，其中<code>?modules</code>可省略</p>
+<p>同时import路径中可添加不同的前缀，来跳过某些类型的loader</p>
+<ul>
+<li><code>!</code>：跳过normal loader</li>
+<li><code>-!</code>：跳过pre和normal loader</li>
+<li><code>!!</code>：跳过除内联外所有loader(pre，normal，post)</li>
+</ul>
+<p>格式举例：<code>import &#39;!!style-loader!css-loader?modules!./css/index.css&#39;</code></p>
+</blockquote>
+<h3 id="按功能分"><a href="#按功能分" class="headerlink" title="按功能分"></a>按功能分</h3><h4 id="同步loader"><a href="#同步loader" class="headerlink" title="同步loader"></a>同步loader</h4><ul>
+<li><p>在同步代码中调用<code>this.callback</code>函数或者<code>return</code>(没有<code>return</code>时可视为<code>return undefined</code>)时代表该loader处理完毕</p>
+</li>
+<li><p>直接<code>return</code>时会将返回值作为<code>content</code>交给下一步，无法传递<code>map</code>和<code>meta</code></p>
+</li>
+<li><p><code>this.callback</code>可传递四个参数，依次为：</p>
+<ul>
+<li>err：错误信息，如有会中断webpack打包，并将错误信息打印输出，没有时传<code>null</code></li>
+<li>content：该loader处理后的资源内容，交给下一个loader或者作为该资源输出内容</li>
+<li>map：SourceMap源代码映射</li>
+<li>meta：向下一个loader传递的参数</li>
+</ul>
+</li>
+</ul>
+<h4 id="异步loader"><a href="#异步loader" class="headerlink" title="异步loader"></a>异步loader</h4><ul>
+<li>需在同步代码中(调用this.callback之前和return之前，一般写在loader中的第一行)调用<code>this.async()</code>，代表该loader为异步loader</li>
+<li><code>this.async()</code>会返回一个函数（暂且命名为<code>callback</code>），会等待异步操作直至执行该函数时，才表明该loader处理完毕，进行下一步</li>
+<li><code>callback</code>可传递四个参数（与同步loader的<code>this.callback</code>参数一致），依次为：<ul>
+<li>err：错误信息，如有会中断webpack打包，并将错误信息打印输出，没有时传<code>null</code></li>
+<li>content：该loader处理后的资源内容，交给下一个loader或者作为该资源输出内容</li>
+<li>map：SourceMap源代码映射</li>
+<li>meta：向下一个loader传递的参数</li>
+</ul>
+</li>
+</ul>
+<h4 id="raw-loader"><a href="#raw-loader" class="headerlink" title="raw loader"></a>raw loader</h4><ul>
+<li>给loader函数添加<code>raw</code>属性并赋值为<code>true</code>时，传递过来的<code>content</code>内容将转变为<code>stringBuffer</code>二进制数据</li>
+</ul>
+<h4 id="pitch-loader"><a href="#pitch-loader" class="headerlink" title="pitch loader"></a>pitch loader</h4><ul>
+<li><p>给loader函数添加<code>pitch</code>属性并赋值为一函数（暂且称之为pitch函数）</p>
+</li>
+<li><p>loader执行有两个阶段，分别为<code>pitching</code>阶段(标记阶段)和<code>normal</code>阶段(执行阶段)，并且先进行<code>pitching</code>阶段再进行<code>normal</code>阶段，<code>pitching</code>阶段的执行顺序与<code>normal</code>阶段完全相反，可类比事件捕获与事件冒泡</p>
+<ul>
+<li><code>pitching</code>阶段执行顺序：<code>post-&gt; inline-&gt; normal-&gt; pre</code>，同级下从左到右，从上到下</li>
+<li><code>normal</code>阶段执行顺序：<code>pre -&gt; normal -&gt; inline -&gt; post</code>，同级从右到左，从下到上</li>
+</ul>
+</li>
+<li><p>webpack会给<code>pitch</code>函数传递三个参数，依次为：</p>
+<ul>
+<li>remainingRequest：string字符串类型，<code>pitching</code>阶段中还未执行的loader的绝对路径，类似于inline内联loader格式，格式为<code>loader1绝对路径!laoder2绝对路径...!处理的资源的绝对路径</code>，包含处理的资源</li>
+<li>precedingRequest：string字符串类型，<code>pitching</code>阶段中已经执行过的loader的绝对路径，类似于inline内联loader格式，格式为<code>loader1绝对路径!laoder2绝对路径...</code>，不包含处理的资源</li>
+<li>data：初始化为空对象，可对其添加属性并赋值，在该loader进行<code>normal</code>阶段时可通过<code>this.data</code>访问<code>pitching</code>阶段中添加的属性和属性值</li>
+</ul>
+</li>
+<li><p>如果<code>pitch</code>函数返回了非<code>undefined</code>内容，将中断<code>pitching</code>阶段，发生熔断效果，并从<code>pitching</code>阶段中上一个loader开始，将<code>pitch</code>函数的返回值作为content，进行<code>normal</code>阶段</p>
+</li>
+</ul>
+<h2 id="loader常用API"><a href="#loader常用API" class="headerlink" title="loader常用API"></a>loader常用API</h2><ul>
+<li><p><code>this.callback(err, content, map, meta)</code>：调用时同步loader处理完毕，并向下一个loader传递内容</p>
+</li>
+<li><p><code>this.async()</code>：调用时返回类似于<code>this.callback</code>的函数，可在异步操作中调用返回的函数，并向下一个loader传递内容</p>
+</li>
+<li><p><code>this.getOptions(schema)</code>：获取loader的options，其中schema是对options的验证规则，来判断传递的options是否合法</p>
+</li>
+<li><p><code>this.emitFile(name, content, map)</code>：产生新建一个文件</p>
+</li>
+<li><p><code>this.utils.contextify(context, path)</code>：根据上下文返回一相对路径</p>
+</li>
+<li><p><code>this.utils.absolutify(context, path)</code>：根据上下文返回一绝对路径</p>
+</li>
+</ul>
+<h2 id="loader案例"><a href="#loader案例" class="headerlink" title="loader案例"></a>loader案例</h2><h3 id="同步loader与getOptions示例-banner-loader-添加作者信息等注释"><a href="#同步loader与getOptions示例-banner-loader-添加作者信息等注释" class="headerlink" title="同步loader与getOptions示例(banner_loader:添加作者信息等注释)"></a>同步loader与getOptions示例(banner_loader:添加作者信息等注释)</h3><ul>
+<li>.&#x2F;webpack.config.js</li>
+</ul>
+<pre><code class="js">/*
+    其它代码
+*/
+module.exports = &#123;
+    /*
+        其它代码
+    */
+    module: &#123;
+        rules: [
+            &#123;
+                test: /\.js$/,
+                // 自定义loader的路径
+                loader: &#39;./loaders/banner_loader.js&#39;,
+                // 给loader传递可选项
+                options: &#123;
+                    // 传递author属性，且属性值为&#39;FX&#39;的字符串类型
+                    author: &#39;FX&#39;,
+                &#125;
+            &#125;,
+            /*
+                其它代码
+            */
+        ],
+    &#125;,
+&#125;
+</code></pre>
+<ul>
+<li>.&#x2F;loaders&#x2F;banner&#x2F;schema.json</li>
+</ul>
+<pre><code class="json">&#123;
+  &quot;type&quot;: &quot;object&quot;, // options类型为object类型
+  // 所拥有的属性
+  &quot;properties&quot;: &#123;
+    &quot;author&quot;: &#123;
+      &quot;type&quot;: &quot;string&quot;, // 类型为字符串类型的author属性
+    &#125;,
+  &#125;,
+  &quot;additionalProperties&quot;: false, // 是否能够自定义附加属性(除properties中的属性外是否还允许传递其他属性)
+&#125;
+</code></pre>
+<ul>
+<li>.&#x2F;loaders&#x2F;banner&#x2F;banner_loader.js</li>
+</ul>
+<pre><code class="js">// 引入验证规则
+const schema = require(&#39;./schema.json&#39;);
+
+module.exports = function (content, map, meta) &#123;
+    // 获取符合验证规则的参数，不符合则报错
+    const options = this.getOptions(schema);
+    // 注释信息模板
+    const prefix = `
+    /*
+    * Author: $&#123; options.author || &#39;&#39; &#125;
+    */
+    `.replace(/\n\s+/g,&#39;\n&#39;);
+    // 在内容前面添加注释信息
+    content = prefix + content;
+       // 将新的资源内容传递下去
+    this.callback(null, content, map, meta);
+&#125;
+</code></pre>
+<h3 id="异步loader示例-babel-loader-代码兼容性处理"><a href="#异步loader示例-babel-loader-代码兼容性处理" class="headerlink" title="异步loader示例(babel_loader:代码兼容性处理)"></a>异步loader示例(babel_loader:代码兼容性处理)</h3><ul>
+<li>下载相关babel处理的包：<code>npm i @babel/core @babel/preset-env -D</code></li>
+<li>.&#x2F;webpack.config.js</li>
+</ul>
+<pre><code class="js">/*
+    其它代码
+*/
+module.exports = &#123;
+    /*
+        其它代码
+    */
+    module: &#123;
+        rules: [
+            &#123;
+                test: /\.js$/,
+                loader: &#39;./loaders/babel_loader&#39;,
+                // 传递babel预设
+                options: &#123;
+                    presets: [&#39;@babel/preset-env&#39;],
+                &#125;
+            &#125;,
+            /*
+                其它代码
+            */
+        ],
+    &#125;,
+&#125;
+</code></pre>
+<ul>
+<li>.&#x2F;loaders&#x2F;babel-loader&#x2F;index.js</li>
+</ul>
+<pre><code class="js">// 引入babel相关包
+// 官网为https://www.babeljs.cn/docs/babel-core
+const babel = require(&#39;@babel/core&#39;);
+
+// 验证规则
+const schema = &#123;
+    &quot;type&quot;: &quot;object&quot;,
+    &quot;properties&quot;: &#123;
+        &quot;presets&quot;: &#123;
+            &quot;type&quot;: &quot;array&quot;
+        &#125;
+    &#125;,
+    &quot;additionalProperties&quot;: true
+&#125;
+
+module.exports = function (content, map, meta) &#123;
+    const callback = this.async();
+    const options = this.getOptions(schema);
+    /* 
+        代码兼容性编译（异步操作）
+        babel.transform(code, options, callback(err, result)):
+            - code: 需要编译的代码
+            - options: 编译的选项
+            - callback(err, result): 编译处理结果的回调函数
+                - err: 错误信息
+                - result: 编译结果
+    */
+    babel.transform(content, options, (err, result) =&gt; &#123;
+        err ? callback(err) : callback(null, result.code, map, meta);
+    &#125;)
+&#125;
+</code></pre>
+<h3 id="raw-loader和emitFile示例-file-loader-处理文件资源"><a href="#raw-loader和emitFile示例-file-loader-处理文件资源" class="headerlink" title="raw loader和emitFile示例(file-loader:处理文件资源)"></a>raw loader和emitFile示例(file-loader:处理文件资源)</h3><ul>
+<li><p>文件资源需在css中引入使用，故需先对css资源处理，下载<code>css-loader</code>和<code>style-loader</code>来处理<code>npm i style-loader css-loader -D</code>来处理</p>
+</li>
+<li><p>对输出时的文件命名需借助官方工具<code>loader-utils</code>来处理（<code>npm i loader-utils -D</code>），来根据文件内容生成带哈希值的文件名</p>
+</li>
+<li><p>.&#x2F;webpack.config.js</p>
+</li>
+</ul>
+<pre><code class="js">/*
+    其它代码
+*/
+module.exports = &#123;
+    /*
+        其它代码
+    */
+    module: &#123;
+        rules: [
+            &#123;
+                test: /\.css$/,
+                use: [&#39;style-loader&#39;, &#39;css-loader&#39;]
+            &#125;,
+            &#123;
+                test: /\.(png|jpe?g|gif|bmp)$/,
+                loader: &#39;./loaders/file-loader&#39;,
+                // 阻止webpack对文件资源的默认(assets/source)处理行为
+                type: &#39;javascript/auto&#39;,
+            &#125;,
+            /*
+                其它代码
+            */
+        ],
+    &#125;,
+&#125;
+</code></pre>
+<ul>
+<li>.&#x2F;loaders&#x2F;file-loader&#x2F;index.js</li>
+</ul>
+<pre><code class="js">// 引入官方工具包
+const loaderUtils = require(&#39;loader-utils&#39;);
+
+module.exports = function (content, map, meta) &#123;
+    // 使用官方工具包，根据文件内容形成带哈希值的文件名
+    // loaderUtils.interpolateName(context, name, options)
+    let interpolateName = loaderUtils.interpolateName(this, &#39;[contenthash:10].[ext][query]&#39;, &#123;
+        content,
+    &#125;);
+    interpolateName = `images/$&#123; interpolateName &#125;`;
+    // 根据文件内容和刚刚生成的文件名来输出一个文件
+    // this.emitFile(name, content, map);
+    this.emitFile(interpolateName, content, map);
+    // 返回引入文件的字符串
+    const file = `module.exports = &#39;$&#123; interpolateName &#125;&#39;;`;
+    this.callback(null, file, map, meta);
+&#125;
+
+// 处理图片、字体等资源时，需对Buffer数据进行处理
+// 该loader接收到的content将会转为stringBuffer
+module.exports.raw = true;
+</code></pre>
+<h3 id="pitch-loader与inline内联loader-style-loader-将样式模块添加到创建的style标签中"><a href="#pitch-loader与inline内联loader-style-loader-将样式模块添加到创建的style标签中" class="headerlink" title="pitch loader与inline内联loader(style-loader:将样式模块添加到创建的style标签中)"></a>pitch loader与inline内联loader(style-loader:将样式模块添加到创建的style标签中)</h3><h4 id="分析（为何需要pitching阶段）"><a href="#分析（为何需要pitching阶段）" class="headerlink" title="分析（为何需要pitching阶段）"></a>分析（为何需要pitching阶段）</h4><ul>
+<li>style-loader的normal阶段如下，如果只有normal阶段，会有诸多问题：</li>
+</ul>
+<pre><code class="js">module.exports = function (content, map, meta) &#123;
+    const script = `
+        const styleElement = document.createElement(&#39;style&#39;);
+        styleElement.innerHTML = $&#123; JSON.stringify(content) &#125;;
+        document.head.appendChild(styleElement);
+    `;
+    this.callback(null, script, map, meta);
+&#125;
+</code></pre>
+<blockquote>
+<ol>
+<li>如果只使用该style-loader的normal阶段，将无法处理文件资源的引入(如引入其他css样式、图片资源、字体图标资源等)</li>
+<li>如果只使用该style-loader和css-loader的normal阶段，css资源由css-loader处理后将转变为js模块(js代码)，此时如果直接将css-loader处理后的结果content添加到style标签中将无法生效</li>
+</ol>
+</blockquote>
+<h4 id="方案"><a href="#方案" class="headerlink" title="方案"></a>方案</h4><ul>
+<li>需先将css代码加载为模块，下载css-loader进行处理<code>npm i css-loader -D</code></li>
+<li>.&#x2F;webpack.config.js</li>
+</ul>
+<pre><code class="js">/*
+    其它代码
+*/
+module.exports = &#123;
+    /*
+        其它代码
+    */
+    module: &#123;
+        rules: [
+            &#123;
+                test: /\.css$/,
+                use: [&#39;./loaders/style-loader&#39;, &#39;css-loader&#39;]
+            &#125;,
+            /*
+                其它代码
+            */
+        ],
+    &#125;,
+&#125;
+</code></pre>
+<ul>
+<li>.&#x2F;loaders&#x2F;style-loader&#x2F;index.js</li>
+</ul>
+<pre><code class="js">module.exports = function (content, map, meta) &#123;
+
+&#125;
+
+
+// remainingRequest：pitching阶段还未处理运行的loader和资源组成的内联loader格式的url，但每一项都是绝对路径，需先转化为相对路径
+module.exports.pitch = function (remainingRequest, precedingRequest, data) &#123;
+    let loaderList = remainingRequest.split(&#39;!&#39;);
+    // 将绝对路径转为相对路径
+    loaderList = loaderList.map(absolutePath =&gt; this.utils.contextify(this.context, absolutePath));
+    // 拼接为内联loader，便于import
+    let loaderUrl = loaderList.join(&#39;!&#39;);
+    const script = `
+        // 通过内联loader的方式，并用&#39;!!&#39;跳过其他的loader，阻止死循环处理资源
+        // pitching阶段有返回值时，会将返回值传递给pitching阶段中上一个loader，开始执行normal阶段，代表该loader执行完毕，loaderUrl也未包含该loader
+        import styleContent from &#39;!!$&#123; loaderUrl &#125;&#39;;
+        const styleElement = document.createElement(&#39;style&#39;);
+        styleElement.innerHTML = styleContent;
+        document.head.appendChild(styleElement);
+    `;
+    // 中止pitching阶段，将返回值传递给pitching阶段中上一个loader，此时没有上一个loader，则会将返回值形成模块，供js文件中引入使用
+    return script;
+&#125;
+</code></pre>
+
+  </div>
+  <div id="gitalk-container"></div>
+</div>
+
+<script>
+  
+Fancybox.bind('[data-fancybox="fancybox-gallery-img"]', {
+  dragToClose: true,
+  Toolbar: true,
+  closeButton: "top",
+  Image: {
+    zoom: true,
+  },
+  on: {
+    initCarousel: (fancybox) => {
+      const slide = fancybox.Carousel.slides[fancybox.Carousel.page];
+      fancybox.$container.style.setProperty(
+        "--bg-image",
+        `url("${slide.$thumb.src}")`
+      );
+    },
+    "Carousel.change": (fancybox, carousel, to, from) => {
+      const slide = carousel.slides[to];
+      fancybox.$container.style.setProperty(
+        "--bg-image",
+        `url("${slide.$thumb.src}")`
+      );
+    },
+  },
+});
+</script>
+
+<style>
+    #noneimg img {
+        display: none;
+        z-index: 9999;
+        /* width: 600px !important; */
+        min-width: 0%;
+        max-width: 90%;
+        max-height: 80%;
+        border-radius: 0px;
+        position: fixed;
+        box-shadow: 0 0 0px #c3c3c300 !important;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        margin: auto !important;
+    }
+
+    @media screen and (max-width:600px) {
+        #noneimg img {
+            max-width: 88%
+        }
+    }
+</style>
+
+    <div class="post-paging">
+    
+
+    
+    <a href="/2023/03/13/webpack%E4%BC%98%E5%8C%96%E4%B9%8B%E4%BB%A3%E7%A0%81%E5%88%86%E5%89%B2/">
+        <div class="post-paging-next">
+            <span>下一篇</span>
+            <p>webpack优化之代码分割(code split)</p>
+        </div>
+    </a>
+    
+</div>
+</div>
+		
+<div class="footer">
+	<div class="Copyright">
+		©2023 By 方永魔迹. 主题：<a
+			style="text-decoration: none;display: contents; color: #898F9F;"
+			target="_blank" rel="noopener" href="https://github.com/79e/hexo-theme-quiet">Quiet</a>
+	</div>
+	<div class="contact">
+		
+		<a target="_blank" rel="noopener" href="https://github.com/79E/hexo-theme-quiet">
+			<img src="https://cdn.jsdelivr.net/gh/duogongneng/MyBlogImg/imggithub.png" alt="Quiet主题">
+		</a>
+		
+	</div>
+</div>
+
+<script src="/js/gotop.js"></script>
+
+
+<style type="text/css">
+    @media screen and (min-width: 600px) {
+        .goTop>span {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            opacity: 0.8;
+            background: rgba(18, 24, 58, 0.06);
+            text-align: center;
+            transition: border .5s;
+            border: 1px solid rgba(18, 24, 58, 0.06);
+
+            -moz-transition: border .5s;
+            /* Firefox 4 */
+            -webkit-transition: border .5s;
+            /* Safari 和 Chrome */
+            -o-transition: border .5s;
+            /* Opera */
+        }
+
+        .goTop>span:hover {
+            border: 1px solid #6680B3;
+        }
+
+
+        .goTop {
+            position: fixed;
+            right: 30px;
+            bottom: 80px;
+        }
+
+        .goTop>span>svg {
+            width: 20px;
+            height: 20px;
+            opacity: 0.7;
+        }
+
+    }
+
+    @media screen and (max-width: 600px) {
+        .goTop {
+            display: none;
+        }
+    }
+</style>
+<div class="goTop" id="js-go_top">
+    <span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+            <g>
+                <path d="M13 12v8h-2v-8H4l8-8 8 8z"></path>
+            </g>
+        </svg>
+    </span>
+</div>
+<script>
+    $( '#js-go_top' )
+	.gotoTop( {
+		offset: 500,
+		speed: 300,
+		animationShow: {
+			'transform': 'translate(0,0)',
+			'transition': 'transform .5s ease-in-out'
+		},
+		animationHide: {
+			'transform': 'translate(100px,0)',
+			'transition': 'transform .5s ease-in-out'
+		}
+	} );
+</script>
+
+
+<!-- Baidu Analytics -->
+<script defer>
+    var _hmt = _hmt || [];
+    (function () {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?bdd9b86e96b1aa66ed8efc46bd421ed6";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+
+    <!-- Gitalk -->
+    <script>
+        const data = '{"clientID":"76bcfeb7593bc0a00d08","clientSecret":"769c2fef0e80d1fcd6fb916bd0722e599c0fe2fc","repo":"https://github.com/FXFFFXXX/FXFFFXXX-DIS.git","owner":"FXFFFXXX","admin":"FXFFFXXX"}'
+        const gitalk = new Gitalk({
+            ...JSON.parse( data),
+            id:location.pathname,
+            distractionFreeMode:false
+        })
+        
+        if(Boolean('true')){
+            gitalk.render('gitalk-container')
+        }
+    </script>
+
+<script>
+	console.log('\n %c Hexo-Quiet 主题 %c https://github.com/79e/hexo-theme-quiet \n', 'color: #fadfa3; background: #030307; padding:5px 0;', 'background: #fadfa3; padding:5px 0;')
+</script>
+	</body>
+</html>
+
