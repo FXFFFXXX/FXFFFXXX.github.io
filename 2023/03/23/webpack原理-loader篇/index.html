@@ -324,7 +324,8 @@
   <div id="article" class="post-content-info">
     
 
-    <h1 id="webpack原理-loader篇"><a href="#webpack原理-loader篇" class="headerlink" title="webpack原理-loader篇"></a>webpack原理-loader篇</h1><h2 id="loader简介"><a href="#loader简介" class="headerlink" title="loader简介"></a>loader简介</h2><p>loader本质为一个函数，webpack在处理资源时若匹配到laoder，会将处理的资源内容作为参数来调用loader</p>
+    <h1 id="webpack原理-loader篇"><a href="#webpack原理-loader篇" class="headerlink" title="webpack原理-loader篇"></a>webpack原理-loader篇</h1><h2 id="loader简介"><a href="#loader简介" class="headerlink" title="loader简介"></a>loader简介</h2><p>loader本质为一个函数，webpack在处理资源时若匹配到loader，会将处理的资源内容作为参数来调用loader</p>
+<p>loader需为普通函数而不是箭头函数，这样webpack再调用时才有正确的<code>this</code>指向</p>
 <p>webpack会传递给loader三个参数，依次为：</p>
 <ul>
 <li>content：待处理资源的内容或上一个loader处理后的内容</li>
@@ -444,8 +445,8 @@ module.exports = function (content, map, meta) &#123;
 </li>
 <li><p>webpack会给<code>pitch</code>函数传递三个参数，依次为：</p>
 <ul>
-<li>remainingRequest：string字符串类型，<code>pitching</code>阶段中还未执行的loader的绝对路径，类似于inline内联loader格式，格式为<code>loader1绝对路径!laoder2绝对路径...!处理的资源的绝对路径</code>，包含处理的资源</li>
-<li>precedingRequest：string字符串类型，<code>pitching</code>阶段中已经执行过的loader的绝对路径，类似于inline内联loader格式，格式为<code>loader1绝对路径!laoder2绝对路径...</code>，不包含处理的资源</li>
+<li>remainingRequest：string字符串类型，<code>pitching</code>阶段中还未执行的loader的绝对路径，类似于inline内联loader格式，格式为<code>loader1绝对路径!loader2绝对路径...!处理的资源的绝对路径</code>，包含处理的资源</li>
+<li>precedingRequest：string字符串类型，<code>pitching</code>阶段中已经执行过的loader的绝对路径，类似于inline内联loader格式，格式为<code>loader1绝对路径!loader2绝对路径...</code>，不包含处理的资源</li>
 <li>data：初始化为空对象，可对其添加属性并赋值，在该loader进行<code>normal</code>阶段时可通过<code>this.data</code>访问<code>pitching</code>阶段中添加的属性和属性值</li>
 </ul>
 </li>
