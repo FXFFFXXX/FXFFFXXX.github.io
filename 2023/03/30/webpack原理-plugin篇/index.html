@@ -358,7 +358,7 @@
     &#125;
 &#125;
 </code></pre>
-<p><img src="/2023/03/30/webpack%E5%8E%9F%E7%90%86-plugin%E7%AF%87/.%5Cwebpack-hooks.jpg"></p>
+<p><img src="/.%5Cwebpack%E5%8E%9F%E7%90%86-plugin%E7%AF%87%5Cwebpack-hooks.jpg"></p>
 <h2 id="webpack生命周期钩子"><a href="#webpack生命周期钩子" class="headerlink" title="webpack生命周期钩子"></a>webpack生命周期钩子</h2><ul>
 <li><p>webpack的钩子是通过<code>Tapable</code>进行了接口封装的，<code>Tapable</code>还为每个钩子暴露了三个接口来注册该钩子</p>
 <ul>
@@ -367,7 +367,7 @@
 <li><code>tapPromise</code>：注册异步钩子，在webpack中将把<code>compilation</code>对象传递给钩子函数中，需返回<code>Promise</code>对象，该<code>Promise</code>对象状态为<code>resolve</code>时才代表此次注册的钩子执行完毕</li>
 </ul>
 </li>
-<li><p>webpack中一共设置了十种类型的钩子，详见<a target="_blank" rel="noopener" href="https://github.com/webpack/tapable#tapable">webpack 钩子类型</a>，截止<a href="mailto:&#119;&#x65;&#x62;&#x70;&#97;&#x63;&#x6b;&#64;&#53;&#46;&#x33;&#55;&#x2e;&#x30;">&#119;&#x65;&#x62;&#x70;&#97;&#x63;&#x6b;&#64;&#53;&#46;&#x33;&#55;&#x2e;&#x30;</a>，钩子类型统计如下</p>
+<li><p>webpack中一共设置了十种类型的钩子，详见<a target="_blank" rel="noopener" href="https://github.com/webpack/tapable#tapable">webpack 钩子类型</a>，截止<a href="mailto:&#119;&#x65;&#x62;&#x70;&#97;&#x63;&#107;&#64;&#x35;&#x2e;&#x33;&#55;&#x2e;&#x30;">&#119;&#x65;&#x62;&#x70;&#97;&#x63;&#107;&#64;&#x35;&#x2e;&#x33;&#55;&#x2e;&#x30;</a>，钩子类型统计如下</p>
 </li>
 </ul>
 <table>
@@ -452,7 +452,7 @@
 </ul>
 </li>
 </ul>
-<p><img src="/2023/03/30/webpack%E5%8E%9F%E7%90%86-plugin%E7%AF%87/.%5Cwebpack-hooks2.jpg"></p>
+<p><img src="/.%5Cwebpack%E5%8E%9F%E7%90%86-plugin%E7%AF%87%5Cwebpack-hooks2.jpg"></p>
 <h2 id="plugin示例"><a href="#plugin示例" class="headerlink" title="plugin示例"></a>plugin示例</h2><h3 id="emit钩子与资源的获取修改-banner-plugin-添加作者信息等注释"><a href="#emit钩子与资源的获取修改-banner-plugin-添加作者信息等注释" class="headerlink" title="emit钩子与资源的获取修改(banner_plugin:添加作者信息等注释)"></a>emit钩子与资源的获取修改(banner_plugin:添加作者信息等注释)</h3><ul>
 <li><code>emit</code>：AsyncSeriesHook异步串行钩子，输出 asset 到 output 目录之前执行，回调参数为<code>compilation</code>，可在此处修改<code>assets</code>内容，来改变输出的结果</li>
 <li>.&#x2F;webpack.config.js</li>
@@ -663,7 +663,7 @@ module.exports = AnalyzePlugin;
 <li>子编译器<code>childCompiler</code>与<code>compiler</code>类似，是<code>compiler</code>某些内容的提取，会剔除部分生命周期</li>
 <li><code>html-webpack-plugin</code>具有子编译器，也有它特定的生命周期，它的生命周期在创建了<code>compilation</code>之后才开始，将处理后的html输出到<code>compilation.assets</code>后结束，详见<a target="_blank" rel="noopener" href="https://github.com/jantimon/html-webpack-plugin/#afteremit-hook">html-webpack-plugin 官方文档</a></li>
 </ul>
-<p><img src="/2023/03/30/webpack%E5%8E%9F%E7%90%86-plugin%E7%AF%87/.%5Chtmlwebpackplugin-hooks.png" alt="image-20230405184554960"></p>
+<p><img src="/.%5Cwebpack%E5%8E%9F%E7%90%86-plugin%E7%AF%87%5Chtmlwebpackplugin-hooks.png" alt="image-20230405184554960"></p>
 <ul>
 <li><p>通过<code>HtmlWebpackPlugin.getHooks(compilation)</code>的方式获取其钩子，并进行注册</p>
 </li>
