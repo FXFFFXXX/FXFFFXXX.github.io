@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		
+<title>webpack原理-plugin篇-方永魔迹</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="shortcut icon" type="image/x-icon" href="/image/favicon.ico">
+
+<link rel="stylesheet" href="/css/index.css">
+
+
+
+<meta name="keywords" content="webpack,webpack5,打包工具,webpack原理,plugin,">
+<meta name="description" content="webpack原理">
+
+
+<script src="/js/jquery.min.js"></script>
+
+
+<script src="/js/index.js"></script>
+
+
+<script src="/js/fancybox.umd.js"></script>
+
+
+<script src="/js/fancybox-images.js"></script>
+
+
+<script src="/js/gitalk.min.js"></script>
+
+
+<script src="/js/hljs.min.js"></script>
+ 
+<script>hljs.highlightAll();</script>
+
+	<meta name="generator" content="Hexo 6.3.0"></head>
+
+	<body>
+		
+	<div class="header">
+		<div class="header-top" id="header-top">
+			<div class="h-left">
+				<a href="/">
+					<img src="/image/logo.png" alt="Quiet">
+				</a>
+			</div>
+			<div class="h-right">
+				<ul>
+					
+						
+								<li>
+									<a href="/">
+										HOME
+									</a>
+									<span class="dot"></span>
+								</li>
+								
+									
+						
+								<li>
+									<a href="/archives">
+										ARCHIVE
+									</a>
+									<span class="dot"></span>
+								</li>
+								
+									
+						
+								<li>
+									<a href="/categories">
+										CATEGORIES
+									</a>
+									<span class="dot"></span>
+								</li>
+								
+									
+						
+								<li>
+									<a href="/tags">
+										TAGS
+									</a>
+									<span class="dot"></span>
+								</li>
+								
+									
+						
+								<li>
+									<a href="/links">
+										LINKS
+									</a>
+									<span class="dot"></span>
+								</li>
+								
+									
+						
+								<li>
+									<a href="/about">
+										ABOUT
+									</a>
+									<span class="dot"></span>
+								</li>
+								
+									
+				</ul>
+			</div>
+			<div class="h-right-close">
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+					<path fill="none" d="M0 0h24v24H0z" />
+					<path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z" fill="rgba(68,68,68,1)" />
+				</svg>
+			</div>
+		</div>
+	</div>
+	<div class="sidebar">
+    <div class="topo">
+        <h2>方永魔迹</h2>
+    </div>
+    <ul>
+        
+        <li>
+            <a href="/">HOME</a>
+        </li>
+        
+        <li>
+            <a href="/archives">ARCHIVE</a>
+        </li>
+        
+        <li>
+            <a href="/categories">CATEGORIES</a>
+        </li>
+        
+        <li>
+            <a href="/tags">TAGS</a>
+        </li>
+        
+        <li>
+            <a href="/links">LINKS</a>
+        </li>
+        
+        <li>
+            <a href="/about">ABOUT</a>
+        </li>
+        
+    </ul>
+    <div class="my_foot">
+        
+        <a target="_blank" rel="noopener" href="https://github.com/79E/hexo-theme-quiet">
+            <img src="https://cdn.jsdelivr.net/gh/duogongneng/MyBlogImg/imggithub.png" alt="Quiet主题">
+        </a>
+        
+    </div>
+</div>
+<div class='shelter'>
+</div>
+<style>
+    .shelter{
+        background-color: #333;
+        opacity:0.5;
+        cursor: pointer;
+        display: none; 
+        position: fixed;
+        left: 0;
+        top: 0; 
+        right: 0;
+        bottom: 0;
+        z-index: 1998;
+    }
+    .sidebar {
+        width: 66%;
+        height: 100%;
+        position: fixed;
+        top: 0;
+        right: -100%;
+        bottom: 0;
+        background: #fff;
+        z-index: 1999;
+        text-align: center;
+        box-shadow: -6px 0 20px rgba(98, 94, 94, .815);
+    }
+
+    .topo {
+        width: 100%;
+        height: 200px;
+        background: url(https://api.ixiaowai.cn/gqapi/gqapi.php) no-repeat;
+        background-size: 100% 100%;
+        position: relative;
+        display: flex;
+        align-items: flex-end
+    }
+
+    .topo h2 {
+        color: #fff;
+        z-index: 1;
+        position: relative;
+        margin: 0 0 10px 10px;
+        font-size: 1.2em;
+        box-sizing: border-box
+    }
+
+    .topo:before {
+        content: '';
+        background-image: url(/image/pattern.png);
+        background-repeat: repeat;
+        height: 100%;
+        left: 0;
+        position: absolute;
+        top: 0;
+        width: 100%;
+        z-index: 1
+    }
+
+    .sidebar ul {
+        width: 100%;
+        margin-top: 50px
+    }
+
+    .sidebar ul li {
+        height: 50px;
+        list-style: none;
+        font-size: 1.2em;
+        text-align: right;
+        margin-right: 10px
+    }
+
+    .sidebar ul li a {
+        display: grid;
+        color: #5d606a;
+        text-overflow: ellipsis;
+        width: 100%;
+        text-decoration: none
+    }
+
+    .my_foot {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        position: absolute;
+        bottom: 0
+    }
+
+    .my_foot a {
+        text-decoration: none;
+        margin-right: 10px;
+        display: inline-block
+    }
+
+    .my_foot a img {
+        width: 30px;
+        height: 30px
+    }
+</style>
+
+<script>
+    $( function () {
+	$( '.h-right-close>svg' )
+		.click( function () {
+			$( '.sidebar' )
+				.animate( {
+					right: "0"
+				}, 500 );
+			$( '.shelter' )
+				.fadeIn( "slow" )
+		} );
+	$( '.shelter' )
+		.click( function ( e ) {
+			$( '.sidebar' )
+				.animate( {
+					right: "-100%"
+				}, 500 );
+			$( '.shelter' )
+				.fadeOut( "slow" )
+		} )
+} )
+
+</script>
+
+<div class="post">
+    <div class="post-header-background post-header-img"
+    style="background: url('https://api.ixiaowai.cn/gqapi/gqapi.php')" 
+>
+    <div class="post-header-background-content">
+        <ul class="post-header-tag">
+            
+            
+            <li><a href="/tags/webpack">webpack</a></li>
+            
+            <li><a href="/tags/webpack5">webpack5</a></li>
+            
+            <li><a href="/tags/打包工具">打包工具</a></li>
+            
+            <li><a href="/tags/webpack原理">webpack原理</a></li>
+            
+            <li><a href="/tags/plugin">plugin</a></li>
+            
+            
+        </ul>
+        
+        <h1>webpack原理-plugin篇</h1>
+        <div class="post-header-info">
+            <div class="post-header-info-author">
+                
+                    <svg t="1604839279282" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                        xmlns="http://www.w3.org/2000/svg" p-id="2901" width="20" height="20">
+                        <path
+                            d="M513 956.3c-247.7 0-448-200.3-448-448S265.3 66.2 513 66.2s448 200.3 448 448-200.3 442.1-448 442.1z m0-830.9c-212.2 0-388.8 170.7-388.8 388.8C124.2 726.3 294.9 903 513 903c212.2 0 388.8-170.7 388.8-388.8S725.2 125.4 513 125.4z m0 430.2c-94.2 0-170.7-76.5-170.7-170.7S418.8 207.8 513 207.8s170.7 76.5 170.7 170.7S607.2 555.6 513 555.6z m0-289.1c-64.6 0-112 52.8-112 112s47.4 117.9 112 117.9 112-52.8 112-112-47.4-117.9-112-117.9z m0 689.8c-135.7 0-259-58.7-341.9-158.9l-11.8-17.8 11.8-17.8c76.5-117.9 206.2-188.5 347.8-188.5 135.7 0 265 64.6 341.9 182.6l11.8 17.8-11.8 17.8C778 897.1 648.7 956.3 513 956.3zM230.3 773.2C300.9 849.7 406.9 897 513 897c112 0 218.1-47.4 288.6-129.8-70.5-88.2-170.7-135.6-282.7-135.6s-218.1 53.3-288.6 141.6z"
+                            p-id="2902" fill="#ffffff"></path>
+                    </svg>
+                    
+                <span class="post-header-info-author-text"> <a target="_blank" rel="noopener" href="https://fxfffxxx.github.io/about/">方永魔迹</a></span>
+                <div class="post-header-info-author-categories">
+                    
+                         <a href="../../categories/webpack学习/" target="_blank" >webpack学习</a>
+                    
+                </div>
+                <p>2023-03-30 21:50:17</p>
+            </div>
+        </div>
+    </div>
+</div>
+    <div class="post-content" id="content">
+  
+  <div id="article" class="post-content-info">
+    
+
+    <h1 id="webpack原理-plugin篇"><a href="#webpack原理-plugin篇" class="headerlink" title="webpack原理-plugin篇"></a>webpack原理-plugin篇</h1><h2 id="plugin简介"><a href="#plugin简介" class="headerlink" title="plugin简介"></a>plugin简介</h2><ul>
+<li><p>plugin插件是用于扩展webpack的功能，plugin插件中的方法会在webpack打包过程(生命周期钩子)中的某个时机进行调用。</p>
+</li>
+<li><p>在webpack的打包过程中会有多个钩子，plugin就是在不同的钩子中执行相应的功能方法</p>
+</li>
+<li><p>plugin本质是一个类，需包含构造器和<code>apply</code>方法，并在webpack配置项plugins中创建该plugin实例</p>
+</li>
+<li><p>webpack在读取配置文件时，会创建每个plugin的实例，并在webpack创建了<code>compiler</code>对象以后，会遍历所有的plugin实例，并将<code>compiler</code>作为参数执行每个plugin实例中的<code>apply</code>方法，可在此处通过<code>compiler</code>对象来注册webpack整个打包流程中的hooks钩子，并将<code>compilation</code>对象作为参数传递给该钩子函数</p>
+</li>
+<li><p>在webpack打包每一个资源(即<code>compiler</code>的<code>make</code>钩子中)时，可在该钩子函数中通过<code>compilation</code>对象来注册该项资源打包流程中的hooks钩子</p>
+</li>
+</ul>
+<p>简单的plugin示例</p>
+<pre><code class="js">class TestPlugin &#123;
+    // 构造器，在webpack加载配置创建实例时调用
+    constructor() &#123;
+
+    &#125;
+
+    /*
+        apply函数由webpack在创建完compiler对象后自动调用
+        * compiler: 里面包含了webpack所有配置，同时可注册hooks
+    */
+    apply(compiler) &#123;
+        // compiler.hooks.钩子名.tap(插件名, 钩子函数)：在compiler中注册整个webpack打包流程的钩子
+        compiler.hooks.make.tap(&#39;TestPlugin&#39;, (compilation) =&gt; &#123;
+            // compilation.hooks.钩子名.tap(插件名, 钩子函数)：在compilation中注册每个资源打包流程中的钩子
+            compilation.hooks.seal.tap(&#39;TestPlugin&#39;, () =&gt; &#123;
+                
+            &#125;)
+        &#125;)
+    &#125;
+&#125;
+</code></pre>
+<p><img src="/2023/03/30/webpack%E5%8E%9F%E7%90%86-plugin%E7%AF%87/.%5Cwebpack%E5%8E%9F%E7%90%86-plugin%E7%AF%87%5Cwebpack-hooks.jpg"></p>
+<h2 id="webpack生命周期钩子"><a href="#webpack生命周期钩子" class="headerlink" title="webpack生命周期钩子"></a>webpack生命周期钩子</h2><ul>
+<li><p>webpack的钩子是通过<code>Tapable</code>进行了接口封装的，<code>Tapable</code>还为每个钩子暴露了三个接口来注册该钩子</p>
+<ul>
+<li><code>tap</code>：注册同步钩子或者异步钩子，在webpack中将把<code>compilation</code>对象传递给钩子函数中</li>
+<li><code>tapAsync</code>：注册异步钩子，在webpack中将把<code>compilation</code>对象和<code>callback</code>函数传递给钩子函数中，执行了<code>callback</code>函数才代表此次注册的钩子执行完毕</li>
+<li><code>tapPromise</code>：注册异步钩子，在webpack中将把<code>compilation</code>对象传递给钩子函数中，需返回<code>Promise</code>对象，该<code>Promise</code>对象状态为<code>resolve</code>时才代表此次注册的钩子执行完毕</li>
+</ul>
+</li>
+<li><p>webpack中一共设置了十种类型的钩子，详见<a target="_blank" rel="noopener" href="https://github.com/webpack/tapable#tapable">webpack 钩子类型</a>，截止<a href="mailto:&#x77;&#x65;&#x62;&#112;&#97;&#x63;&#x6b;&#64;&#x35;&#46;&#x33;&#x37;&#x2e;&#x30;">&#x77;&#x65;&#x62;&#112;&#97;&#x63;&#x6b;&#64;&#x35;&#46;&#x33;&#x37;&#x2e;&#x30;</a>，钩子类型统计如下</p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="center">简介</th>
+<th align="center">统计</th>
+<th align="center"></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">SyncHook</td>
+<td align="center">同步钩子</td>
+<td align="center">Webpack 共出现 86 次，如 Compiler.hooks.compilation</td>
+</tr>
+<tr>
+<td align="center">SyncBailHook</td>
+<td align="center">同步熔断钩子</td>
+<td align="center">Webpack 共出现 90 次，如 Compiler.hooks.shouldEmit</td>
+</tr>
+<tr>
+<td align="center">SyncWaterfallHook</td>
+<td align="center">同步瀑布流钩子</td>
+<td align="center">Webpack 共出现 26 次，如 Compilation.hooks.assetPath</td>
+</tr>
+<tr>
+<td align="center">SyncLoopHook</td>
+<td align="center">同步循环钩子</td>
+<td align="center">Webpack 中未使用</td>
+</tr>
+<tr>
+<td align="center">AsyncParallelHook</td>
+<td align="center">异步并行钩子</td>
+<td align="center">Webpack 仅出现 6 次：Compiler.hooks.make</td>
+</tr>
+<tr>
+<td align="center">AsyncParallelBailHook</td>
+<td align="center">异步并行熔断钩子</td>
+<td align="center">Webpack 中未使用</td>
+</tr>
+<tr>
+<td align="center">AsyncSeriesHook</td>
+<td align="center">异步串行钩子</td>
+<td align="center">Webpack 共出现 32 次，如 Compiler.hooks.done</td>
+</tr>
+<tr>
+<td align="center">AsyncSeriesBailHook</td>
+<td align="center">异步串行熔断钩子</td>
+<td align="center">Webpack 共出现 9 次，如 Compilation.hooks.optimizeChunkModules</td>
+</tr>
+<tr>
+<td align="center">AsyncSeriesLoopHook</td>
+<td align="center">异步串行循环钩子</td>
+<td align="center">Webpack 中未使用</td>
+</tr>
+<tr>
+<td align="center">AsyncSeriesWaterfallHook</td>
+<td align="center">异步串行瀑布流钩子</td>
+<td align="center">Webpack 共出现 3 次，如 ContextModuleFactory.hooks.beforeResolve</td>
+</tr>
+</tbody></table>
+<ul>
+<li><p>可以启动node调试工具，来查看<code>compiler</code>和<code>compilation</code>上的属性</p>
+<ul>
+<li>运行<code>node --inspect-brk ./node_modules/webpack-cli/bin/cli.js</code>，或在<code>package.json</code>中配置指令，即可开启node调试工具并运行webpack</li>
+<li>在浏览器任意标签，打开控制台，可在左上角看到node图标，点击打开即可</li>
+</ul>
+</li>
+<li><p><code>compiler</code>上可注册的钩子详见<a target="_blank" rel="noopener" href="https://webpack.docschina.org/api/compiler-hooks/">compiler 钩子文档</a>，通过<code>compiler.hooks.somehook.tap()</code>的方式注册</p>
+<ul>
+<li><code>hooks</code>：钩子列表</li>
+<li><code>context</code>：当前插件上下文</li>
+<li><code>options</code>：webpack中的所有配置</li>
+<li><code>outputFileSystem</code>：文件操作系统，默认是外存文件系统，可替换为<code>memfs </code>或者在<code>watch</code>模式下，将操作内存</li>
+</ul>
+</li>
+<li><p><code>compilation</code>上可注册的钩子详见<a target="_blank" rel="noopener" href="https://webpack.docschina.org/api/compilation-hooks/">compilation 钩子文档</a></p>
+<ul>
+<li><code>hooks</code>：钩子列表</li>
+<li><code>assets</code>：资源列表，键值对格式为<code>资源名: 资源内容</code></li>
+<li><code>assetsInfo</code>：<code>map</code>对象，资源信息，键值对格式为<code>资源名: 信息列表</code></li>
+</ul>
+</li>
+</ul>
+<p><img src="/2023/03/30/webpack%E5%8E%9F%E7%90%86-plugin%E7%AF%87/.%5Cwebpack%E5%8E%9F%E7%90%86-plugin%E7%AF%87%5Cwebpack-hooks2.jpg"></p>
+<h2 id="plugin示例"><a href="#plugin示例" class="headerlink" title="plugin示例"></a>plugin示例</h2><h3 id="emit钩子与资源的获取修改-banner-plugin-添加作者信息等注释"><a href="#emit钩子与资源的获取修改-banner-plugin-添加作者信息等注释" class="headerlink" title="emit钩子与资源的获取修改(banner_plugin:添加作者信息等注释)"></a>emit钩子与资源的获取修改(banner_plugin:添加作者信息等注释)</h3><ul>
+<li><code>emit</code>：AsyncSeriesHook异步串行钩子，输出 asset 到 output 目录之前执行，回调参数为<code>compilation</code>，可在此处修改<code>assets</code>内容，来改变输出的结果</li>
+<li>.&#x2F;webpack.config.js</li>
+</ul>
+<pre><code class="js">const BannerPlugin = require(&#39;./plugins/banner_plugin&#39;);
+/*
+    其它代码
+*/
+module.exports = &#123;
+    /*
+        其它代码
+    */
+    plugins: [
+        new BannerPlugin(&#123;
+            author: &#39;FX&#39;,
+        &#125;)
+    ]
+&#125;
+</code></pre>
+<ul>
+<li>.&#x2F;plugins&#x2F;banner_plugin.js</li>
+</ul>
+<pre><code class="js">class BannerPlugin &#123;
+
+    constructor(options = &#123;&#125;) &#123;
+        this.options = options;
+    &#125;
+
+    apply(compiler) &#123;
+        // 异步串行，资源输出前触发。回调参数为compilation
+        compiler.hooks.emit.tap(&#39;BannerPlugin&#39;, (compilation) =&gt; &#123;
+            // 1.获取即将输出的资源
+            const assets = compilation.assets;
+            // 2.只保留js、css资源，过滤掉其他资源
+            const assetsPaths = Object.keys(assets).filter((assetPath) =&gt; &#123;
+                return assetPath.match(/\.(js|css)$/);
+            &#125;)
+
+            // 3.遍历过滤后的资源，添加作者信息等注释
+            const prefix = `
+                /*
+                    * Author: $&#123; this.options.author || &#39;&#39; &#125;
+                */
+            `.replace(/[\r\n]\s+/g,&#39;\r\n&#39;).replace(/^[\r\n\s]+/, &#39;&#39;);
+            assetsPaths.forEach((assetPath) =&gt; &#123;
+                // 通过调用source方法获取资源内容
+                let content = assets[assetPath].source();
+                // 拼接内容
+                content = prefix + content;
+                // 修改或新增资源，source方法的返回值代表资源内容，size方法返回值代表资源大小
+                assets[assetPath] = &#123;
+                    source() &#123;
+                        return content;
+                    &#125;,
+                    size() &#123;
+                        return content.length;
+                    &#125;
+                &#125;;
+            &#125;)
+        &#125;)
+
+    &#125;
+&#125;
+
+module.exports = BannerPlugin;
+</code></pre>
+<h3 id="emit钩子与资源的删除-clean-plugin-清空打包目录"><a href="#emit钩子与资源的删除-clean-plugin-清空打包目录" class="headerlink" title="emit钩子与资源的删除(clean_plugin:清空打包目录)"></a>emit钩子与资源的删除(clean_plugin:清空打包目录)</h3><ul>
+<li><code>emit</code>：AsyncSeriesHook异步串行钩子，输出 asset 到 output 目录之前执行，回调参数为<code>compilation</code>，可在此处修改<code>assets</code>内容，来改变输出的结果，此插件在此处清空输出目录，不操作<code>assets</code></li>
+<li>需在<code>output</code>中关闭webpack内置的<code>clean</code>，以便测试</li>
+<li>.&#x2F;webpack.config.js</li>
+</ul>
+<pre><code class="js">const CleanPlugin = require(&#39;./plugins/clean_plugin&#39;);
+/*
+    其它代码
+*/
+module.exports = &#123;
+    /*
+        其它代码
+    */
+    plugins: [
+        new CleanPlugin()
+    ]
+&#125;
+</code></pre>
+<ul>
+<li>.&#x2F;plugins&#x2F;clean_plugin.js</li>
+</ul>
+<pre><code class="js">const &#123;logPlugin&#125; = require(&quot;@babel/preset-env/lib/debug&quot;);
+
+class CleanPlugin &#123;
+
+    constructor() &#123;
+
+    &#125;
+
+    apply(compiler) &#123;
+        // 异步串行，资源输出前触发。回调参数为compilation
+        compiler.hooks.emit.tapPromise(&#39;CleanPlugin&#39;, (compilation) =&gt; &#123;
+            // 1.获取打包输出目录
+            const outputPath= compiler.outputPath;
+            // const outputPath= compiler.options.output.path;
+            // 2.通过fs文件操作删除输出目录下的所有文件
+            const fs = compiler.outputFileSystem;
+            return this.removeFiles(fs, outputPath);
+        &#125;)
+    &#125;
+    
+    // 递归删除文件或目录
+    removeFiles(fs, path) &#123;
+        return new Promise((resolve, reject) =&gt; &#123;
+            // 获取文件信息，判断是文件夹还是文件
+            fs.stat(path, (err, info) =&gt; &#123;
+                if (info.isDirectory()) &#123;
+                    // 如果是文件夹，需先递归删除里面的内容，最后再删除该文件夹
+                    new Promise((resolveItem) =&gt; &#123;
+                        // 读取文件夹下的文件名称
+                        fs.readdir(path, (err, files) =&gt; &#123;
+                            resolveItem(files);
+                        &#125;)
+                    &#125;).then((files) =&gt; &#123;
+                        // 对每一个文件进行删除
+                        let DirPromiseArr = files.map(file =&gt; this.removeFiles(fs, path + &#39;/&#39; + file))
+                        return Promise.all(DirPromiseArr);
+                    &#125;).then(() =&gt; &#123;
+                        // 里面的内容全部删除后，再删除该文件夹
+                        fs.rmdir(path, () =&gt; &#123;
+                            resolve();
+                        &#125;)
+                    &#125;)
+                &#125; else &#123;
+                    // 如果是文件，直接删除文件即可
+                    fs.unlink(path, () =&gt; &#123;
+                        resolve();
+                    &#125;)
+                &#125;
+            &#125;)
+        &#125;)
+    &#125;
+&#125;
+
+module.exports = CleanPlugin;
+</code></pre>
+<h3 id="emit钩子与资源信息的获取和新建资源-analaze-plugin-输出文件信息"><a href="#emit钩子与资源信息的获取和新建资源-analaze-plugin-输出文件信息" class="headerlink" title="emit钩子与资源信息的获取和新建资源(analaze_plugin:输出文件信息)"></a>emit钩子与资源信息的获取和新建资源(analaze_plugin:输出文件信息)</h3><ul>
+<li><code>emit</code>：AsyncSeriesHook异步串行钩子，输出 asset 到 output 目录之前执行，回调参数为<code>compilation</code>，可在此处修改<code>assets</code>内容，来改变输出的结果，此插件在此处获取<code>assets</code>中的资源信息，并在<code>assets</code>中新增一个资源进行输出</li>
+<li>.&#x2F;webpack.config.js</li>
+</ul>
+<pre><code class="js">const AnalazePlugin = require(&#39;./plugins/analaze_plugin&#39;);
+/*
+    其它代码
+*/
+module.exports = &#123;
+    /*
+        其它代码
+    */
+    plugins: [
+        new AnalazePlugin()
+    ]
+&#125;
+</code></pre>
+<ul>
+<li>.&#x2F;plugins&#x2F;analaze_plugin.js</li>
+</ul>
+<pre><code class="js">class AnalyzePlugin &#123;
+
+    constructor() &#123;
+
+    &#125;
+
+    apply(compiler) &#123;
+        // 异步串行，资源输出前触发。回调参数为compilation
+        compiler.hooks.emit.tap(&#39;AnalazePlugin&#39;, (compilation) =&gt; &#123;
+            // 1.遍历所有即将输出文件，得到其大小，生成输出信息
+            const assets = compilation.assets;
+            /*
+                Object.entries(array)：
+                    将键值对转换为二维数组，二维数组的第一个arr[i][0]为键key，第二个arr[i][1]为值value
+                    如&#123; &#39;name&#39;: &#39;FX&#39;, &#39;year&#39;: &#123;&#125; &#125;] -&gt; [[&#39;name&#39;, &#39;FX&#39;], [&#39;year&#39;, &#123;&#125;]]
+            */
+            const assetsArr = Object.entries(assets);
+            let content = `
+                | 资源路径 | 资源大小 |
+                | --- | --- |
+            `.replace(/[\r\n]\s+/g, &#39;\n&#39;).replace(/((^[\r\n\s]+)|([\r\n\s]+$))/g, &#39;&#39;);
+            assetsArr.forEach(([filename, file]) =&gt; &#123;
+                // 调用size方法获取资源大小
+                content = `
+                    $&#123; content &#125;
+                    | $&#123; filename &#125; | $&#123; (file.size() / 1024).toFixed(2) &#125;kb |
+                `.replace(/[\r\n]\s+/g, &#39;\n&#39;).replace(/((^[\r\n\s]+)|([\r\n\s]+$))/g, &#39;&#39;);
+            &#125;)
+            // 2.生成md文件，并写入相关信息，source方法的返回值代表资源内容，size方法返回值代表资源大小
+            assets[&#39;analyze.md&#39;] = &#123;
+                source() &#123;
+                    return content;
+                &#125;,
+                size() &#123;
+                    return content.length;
+                &#125;
+            &#125;
+        &#125;)
+    &#125;
+
+&#125;
+
+module.exports = AnalyzePlugin;
+</code></pre>
+<h3 id="子编译器html-webpack-plugin的钩子使用-Inline-chunk-Plugin-将体积小的资源内嵌到html文件中"><a href="#子编译器html-webpack-plugin的钩子使用-Inline-chunk-Plugin-将体积小的资源内嵌到html文件中" class="headerlink" title="子编译器html-webpack-plugin的钩子使用( Inline_chunk_Plugin:将体积小的资源内嵌到html文件中)"></a>子编译器<code>html-webpack-plugin</code>的钩子使用( Inline_chunk_Plugin:将体积小的资源内嵌到html文件中)</h3><ul>
+<li>子编译器<code>childCompiler</code>与<code>compiler</code>类似，是<code>compiler</code>某些内容的提取，会剔除部分生命周期</li>
+<li><code>html-webpack-plugin</code>具有子编译器，也有它特定的生命周期，它的生命周期在创建了<code>compilation</code>之后才开始，将处理后的html输出到<code>compilation.assets</code>后结束，详见<a target="_blank" rel="noopener" href="https://github.com/jantimon/html-webpack-plugin/#afteremit-hook">html-webpack-plugin 官方文档</a></li>
+</ul>
+<p><img src="/2023/03/30/webpack%E5%8E%9F%E7%90%86-plugin%E7%AF%87/.%5Cwebpack%E5%8E%9F%E7%90%86-plugin%E7%AF%87%5Chtmlwebpackplugin-hooks.png" alt="image-20230405184554960"></p>
+<ul>
+<li><p>通过<code>HtmlWebpackPlugin.getHooks(compilation)</code>的方式获取其钩子，并进行注册</p>
+</li>
+<li><p>下载<code>safe-require</code>来间接引入<code>html-webpack-plugin</code>，当<code>html-webpack-plugin</code>不存在的返回<code>undefined</code>而不是报错</p>
+</li>
+<li><p>.&#x2F;webpack.config.js</p>
+</li>
+</ul>
+<pre><code class="js">const HtmlWebpackPlugin = require(&#39;html-webpack-plugin&#39;);
+const InlineChunkPlugin = require(&#39;./plugins/inline_chunk_plugin&#39;);
+/*
+    其它代码
+*/
+module.exports = &#123;
+    /*
+        其它代码
+    */
+    plugins: [
+        /*
+            其它代码
+        */
+        new HtmlWebpackPlugin(&#123;
+            template: path.resolve(__dirname, &#39;public/index.html&#39;),
+            filename: &#39;index.[contenthash:10].html&#39;,
+        &#125;),
+        new InlineChunkPlugin(&#123;
+            tests: [/runtime(.*)\.js$/],
+        &#125;),
+    ],
+    optimization: &#123;
+        /*
+            其它代码
+        */
+        splitChunks: &#123;
+            chunks: &#39;all&#39;
+        &#125;,
+        // 生成体积较小的runtime文件来测试插件
+        runtimeChunk: &#123;
+            name: entryPoint =&gt; `runtime~$&#123; entryPoint.name &#125;.js`
+        &#125;
+    &#125;,
+&#125;
+</code></pre>
+<ul>
+<li>.&#x2F;plugins&#x2F;inline_chunk_plugin</li>
+</ul>
+<pre><code class="js">// 安全引入html-webpack-plugin，不存在时返回undefined来代替报错
+const HtmlWebpackPlugin = require(&#39;safe-require&#39;)(&#39;html-webpack-plugin&#39;);
+
+class InlineChunkPlugin &#123;
+
+    constructor(options) &#123;
+        this.options = options;
+    &#125;
+
+    apply(compiler) &#123;
+        // 同步钩子，compilation 创建之后触发。回调参数为compilation，compilationParams
+        compiler.hooks.compilation.tap(&#39;InlineChunkPlugin&#39;, (compilation) =&gt; &#123;
+            // 获取html-webpack-plugin的钩子列表
+            const htmlHooks = HtmlWebpackPlugin.getHooks(compilation);
+            // 注册html-webpack-plugin中的alterAssetTagGroups钩子，标签分组后触发，回调参数为assets，包含各种标签集合
+            htmlHooks.alterAssetTagGroups.tap(&#39;InlineChunkPlugin&#39;, (assets) =&gt; &#123;
+                // 替换修改标签内容
+                assets.headTags = this.getInlineChunks(assets.headTags, compilation.assets);
+                assets.bodyTags = this.getInlineChunks(assets.bodyTags, compilation.assets);
+            &#125;);
+            // 注册html-webpack-plugin中的afterEmit钩子，html文件提交后触发，在此处删除已经内嵌的资源
+            htmlHooks.afterEmit.tap(&#39;InlineChunkPlugin&#39;, () =&gt; &#123;
+                const assets = compilation.assets;
+                for (let filePath in assets) &#123;
+                    if (this.options.tests.some((test =&gt; filePath.match(test)))) &#123;
+                        delete assets[filePath];
+                    &#125;
+                &#125;
+            &#125;)
+        &#125;)
+
+    &#125;
+
+    getInlineChunks(tags, assets) &#123;
+        return tags.map((tag) =&gt; &#123;
+            // 标签没有属性时不需要修改
+            if (!tag.attributes) return tag;
+            const filePath = tag.attributes.src;
+            // 标签不是引入其他资源时不需要修改
+            if (!filePath) return tag;
+            // 引入的资源不是需要内联的资源时不需要修改
+            if (!this.options.tests.some(test =&gt; filePath.match(test))) return tag;
+            // 设置标签的innerHTML，将资源内容内嵌进来
+            tag.innerHTML = assets[filePath].source();
+            tag.closeTag = true;
+            // 删除引入属性
+            delete tag.attributes.src;
+            return tag;
+        &#125;)
+    &#125;
+
+&#125;
+
+module.exports = InlineChunkPlugin;
+</code></pre>
+
+  </div>
+  <div id="gitalk-container"></div>
+</div>
+
+<script>
+  
+Fancybox.bind('[data-fancybox="fancybox-gallery-img"]', {
+  dragToClose: true,
+  Toolbar: true,
+  closeButton: "top",
+  Image: {
+    zoom: true,
+  },
+  on: {
+    initCarousel: (fancybox) => {
+      const slide = fancybox.Carousel.slides[fancybox.Carousel.page];
+      fancybox.$container.style.setProperty(
+        "--bg-image",
+        `url("${slide.$thumb.src}")`
+      );
+    },
+    "Carousel.change": (fancybox, carousel, to, from) => {
+      const slide = carousel.slides[to];
+      fancybox.$container.style.setProperty(
+        "--bg-image",
+        `url("${slide.$thumb.src}")`
+      );
+    },
+  },
+});
+</script>
+
+<style>
+    #noneimg img {
+        display: none;
+        z-index: 9999;
+        /* width: 600px !important; */
+        min-width: 0%;
+        max-width: 90%;
+        max-height: 80%;
+        border-radius: 0px;
+        position: fixed;
+        box-shadow: 0 0 0px #c3c3c300 !important;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        margin: auto !important;
+    }
+
+    @media screen and (max-width:600px) {
+        #noneimg img {
+            max-width: 88%
+        }
+    }
+</style>
+
+    <div class="post-paging">
+    
+
+    
+    <a href="/2023/03/23/webpack%E5%8E%9F%E7%90%86-loader%E7%AF%87/">
+        <div class="post-paging-next">
+            <span>下一篇</span>
+            <p>webpack原理-loader篇</p>
+        </div>
+    </a>
+    
+</div>
+</div>
+		
+<div class="footer">
+	<div class="Copyright">
+		©2023 By 方永魔迹. 主题：<a
+			style="text-decoration: none;display: contents; color: #898F9F;"
+			target="_blank" rel="noopener" href="https://github.com/79e/hexo-theme-quiet">Quiet</a>
+	</div>
+	<div class="contact">
+		
+		<a target="_blank" rel="noopener" href="https://github.com/79E/hexo-theme-quiet">
+			<img src="https://cdn.jsdelivr.net/gh/duogongneng/MyBlogImg/imggithub.png" alt="Quiet主题">
+		</a>
+		
+	</div>
+</div>
+
+<script src="/js/gotop.js"></script>
+
+
+<style type="text/css">
+    @media screen and (min-width: 600px) {
+        .goTop>span {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            opacity: 0.8;
+            background: rgba(18, 24, 58, 0.06);
+            text-align: center;
+            transition: border .5s;
+            border: 1px solid rgba(18, 24, 58, 0.06);
+
+            -moz-transition: border .5s;
+            /* Firefox 4 */
+            -webkit-transition: border .5s;
+            /* Safari 和 Chrome */
+            -o-transition: border .5s;
+            /* Opera */
+        }
+
+        .goTop>span:hover {
+            border: 1px solid #6680B3;
+        }
+
+
+        .goTop {
+            position: fixed;
+            right: 30px;
+            bottom: 80px;
+        }
+
+        .goTop>span>svg {
+            width: 20px;
+            height: 20px;
+            opacity: 0.7;
+        }
+
+    }
+
+    @media screen and (max-width: 600px) {
+        .goTop {
+            display: none;
+        }
+    }
+</style>
+<div class="goTop" id="js-go_top">
+    <span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+            <g>
+                <path d="M13 12v8h-2v-8H4l8-8 8 8z"></path>
+            </g>
+        </svg>
+    </span>
+</div>
+<script>
+    $( '#js-go_top' )
+	.gotoTop( {
+		offset: 500,
+		speed: 300,
+		animationShow: {
+			'transform': 'translate(0,0)',
+			'transition': 'transform .5s ease-in-out'
+		},
+		animationHide: {
+			'transform': 'translate(100px,0)',
+			'transition': 'transform .5s ease-in-out'
+		}
+	} );
+</script>
+
+
+<!-- Baidu Analytics -->
+<script defer>
+    var _hmt = _hmt || [];
+    (function () {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?bdd9b86e96b1aa66ed8efc46bd421ed6";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+
+    <!-- Gitalk -->
+    <script>
+        const data = '{"clientID":"76bcfeb7593bc0a00d08","clientSecret":"769c2fef0e80d1fcd6fb916bd0722e599c0fe2fc","repo":"https://github.com/FXFFFXXX/FXFFFXXX-DIS.git","owner":"FXFFFXXX","admin":"FXFFFXXX"}'
+        const gitalk = new Gitalk({
+            ...JSON.parse( data),
+            id:location.pathname,
+            distractionFreeMode:false
+        })
+        
+        if(Boolean('true')){
+            gitalk.render('gitalk-container')
+        }
+    </script>
+
+<script>
+	console.log('\n %c Hexo-Quiet 主题 %c https://github.com/79e/hexo-theme-quiet \n', 'color: #fadfa3; background: #030307; padding:5px 0;', 'background: #fadfa3; padding:5px 0;')
+</script>
+	</body>
+</html>
+
