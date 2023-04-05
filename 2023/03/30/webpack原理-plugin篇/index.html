@@ -349,7 +349,7 @@
     */
     apply(compiler) &#123;
         // compiler.hooks.钩子名.tap(插件名, 钩子函数)：在compiler中注册整个webpack打包流程的钩子
-        compiler.hooks.make.t	ap(&#39;TestPlugin&#39;, (compilation) =&gt; &#123;
+        compiler.hooks.make.tap(&#39;TestPlugin&#39;, (compilation) =&gt; &#123;
             // compilation.hooks.钩子名.tap(插件名, 钩子函数)：在compilation中注册每个资源打包流程中的钩子
             compilation.hooks.seal.tap(&#39;TestPlugin&#39;, () =&gt; &#123;
                 
@@ -367,7 +367,7 @@
 <li><code>tapPromise</code>：注册异步钩子，在webpack中将把<code>compilation</code>对象传递给钩子函数中，需返回<code>Promise</code>对象，该<code>Promise</code>对象状态为<code>resolve</code>时才代表此次注册的钩子执行完毕</li>
 </ul>
 </li>
-<li><p>webpack中一共设置了十种类型的钩子，详见<a target="_blank" rel="noopener" href="https://github.com/webpack/tapable#tapable">webpack 钩子类型</a>，截止<a href="mailto:&#119;&#101;&#x62;&#112;&#x61;&#x63;&#107;&#64;&#x35;&#46;&#x33;&#55;&#x2e;&#x30;">&#119;&#101;&#x62;&#112;&#x61;&#x63;&#107;&#64;&#x35;&#46;&#x33;&#55;&#x2e;&#x30;</a>，钩子类型统计如下</p>
+<li><p>webpack中一共设置了十种类型的钩子，详见<a target="_blank" rel="noopener" href="https://github.com/webpack/tapable#tapable">webpack 钩子类型</a>，截止<a href="mailto:&#119;&#x65;&#x62;&#112;&#97;&#x63;&#x6b;&#x40;&#x35;&#x2e;&#x33;&#55;&#46;&#x30;">&#119;&#x65;&#x62;&#112;&#97;&#x63;&#x6b;&#x40;&#x35;&#x2e;&#x33;&#55;&#46;&#x30;</a>，钩子类型统计如下</p>
 </li>
 </ul>
 <table>
